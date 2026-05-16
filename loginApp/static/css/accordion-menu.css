@@ -1,0 +1,40 @@
+/* ==========================================================================
+   ACCORDION MENU - Estilos para menú lateral desplegable
+   ========================================================================== */
+
+/* Los estilos principales del acordeón están en admin_dashboard.css
+   Este archivo contiene estilos adicionales específicos para el acordeón */
+
+/* Animación suave para el contenido del acordeón */
+.accordion-content {
+    transition: max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Iconos de sección con colores específicos */
+.accordion-title i {
+    transition: color 0.3s ease;
+}
+
+/* Efecto de ripple en hover */
+.accordion-content a {
+    position: relative;
+    overflow: hidden;
+}
+
+.accordion-content a::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 0;
+    height: 0;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: width 0.3s ease, height 0.3s ease;
+}
+
+.accordion-content a:hover::after {
+    width: 200%;
+    height: 200%;
+}

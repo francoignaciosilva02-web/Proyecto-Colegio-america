@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Lista de Cursos</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <link rel="stylesheet" href="{% static 'css/cursos_list.css' %}">
+</head>
+<body>
+
+<div class="admin-layout">
+    <!-- 🔹 MENÚ LATERAL -->
+    <div class="sidebar">
+        <h3>📥 Toma de Datos</h3>
+
+        <div class="menu-section">
+            <h4>👨‍🎓 Gestión Académica</h4>
+            <ul class="sidebar-menu">
+                <li><a href="{% url 'alumnos_list' %}">Crear Alumno</a></li>
+                <li><a href="{% url 'docentes_list' %}">Crear Docente</a></li>
+                <li><a href="{% url 'cursos_list' %}" class="active">Crear Curso</a></li>
+                <li><a href="{% url 'inscribir_alumno' %}">Inscribir Alumno</a></li>
+                <li><a href="{% url 'admin_calificaciones' %}">Calificaciones</a></li>
+                <li><a href="{% url 'admin_asistencia' %}">Registrar Asistencia</a></li>
+            </ul>
+        </div>
+
+        <div class="menu-section">
+            <h4>�‍👩‍👦 Gestión Familiar</h4>
+            <ul class="sidebar-menu">
+                <li><a href="{% url 'crear_apoderado' %}">Crear Apoderado</a></li>
+                <li><a href="{% url 'asignar_apoderado' %}">Asignar Apoderado</a></li>
+            </ul>
+        </div>
+
+        <div class="menu-section">
+            <h4>🏥 Información Complementaria</h4>
+            <ul class="sidebar-menu">
+                <li><a href="{% url 'datos_medicos' %}">Datos Médicos</a></li>
+                <li><a href="{% url 'datos_academicos' %}">Datos Académicos</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- 🔹 CONTENIDO PRINCIPAL -->
+    <div class="main-content">
+        <h2>📚 Lista de Cursos</h2>
+
+        <a href="{% url 'cursos_create' %}" class="btn-create">➕ Crear curso</a>
+
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Curso</th>
+                    <th>Año</th>
+                    <th>Docente</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for c in cursos %}
+                <tr>
+                    <td>{{ c.id_curso }}</td>
+                    <td>{{ c.nombre_curso }}</td>
+                    <td>{{ c.año_academico }}</td>
+                    <td>{{ c.nombre }}</td>
+                    <td class="action-btns">
+                        <a href="{% url 'cursos_edit' c.id_curso %}">Editar</a>
+                        <a href="{% url 'cursos_delete' c.id_curso %}" class="delete">Eliminar</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" style="text-align: center; color: rgba(255,255,255,0.7);">No hay cursos registrados</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+</body>
+</html>

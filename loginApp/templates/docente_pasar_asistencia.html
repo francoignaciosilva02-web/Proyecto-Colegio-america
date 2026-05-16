@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Pasar Asistencia - Docente</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/docente_dashboard.css' %}">
+</head>
+<body>
+
+<div class="dashboard-container">
+    <!-- Header -->
+    <div class="dashboard-header">
+        <div class="welcome-section">
+            <h1>👨‍🏫 Pasar Asistencia</h1>
+            <p>Docente: {{ nombre_docente }}</p>
+        </div>
+        <div class="user-section">
+            <span class="user-name">👤 {{ nombre_docente }}</span>
+            <a href="{% url 'docente_dashboard' %}" class="logout-btn">Volver al Dashboard</a>
+        </div>
+    </div>
+
+    <!-- Formulario -->
+    <div class="table-card">
+        <h3>📅 Registrar Asistencia</h3>
+        
+        <form method="post" class="admin-form">
+            {% csrf_token %}
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label>📚 Curso</label>
+                    <select name="id_curso" id="id_curso" required>
+                        <option value="">Seleccione un curso</option>
+                        {% for curso in cursos %}
+                        <option value="{{ curso.0 }}">{{ curso.1 }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>📅 Fecha</label>
+                    <input type="date" name="fecha" id="fecha" value="{{ fecha_hoy }}" required>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn-submit">💾 Cargar Alumnos y Registrar Asistencia</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Auditoría - Admin</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}?v=4.0">
+    <link rel="stylesheet" href="{% static 'css/admin_dashboard.css' %}?v=4.0">
+    <link rel="stylesheet" href="{% static 'css/accordion-menu.css' %}?v=4.0">
+    <!-- FontAwesome para iconos reales -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+</head>
+<body>
+
+<div class="dashboard-container" style="max-width: 1400px; width: 95%;">
+
+    <div class="dashboard-header">
+        <div class="header-title">
+            <span class="admin-badge">ADMIN</span>
+            <h1><i class="fas fa-search"></i> Auditoría</h1>
+        </div>
+        <div class="header-user">
+            <span><i class="fas fa-user-shield"></i> {{ email|default:"Administrador" }}</span>
+        </div>
+    </div>
+
+    <div class="admin-layout">
+        <!-- 🔹 MENÚ LATERAL ACORDEÓN -->
+        <div class="sidebar">
+            <h3><i class="fas fa-database"></i> Panel de Control</h3>
+            
+            <ul class="accordion-menu">
+                <!-- � GESTIÓN ACADÉMICA -->
+                <li class="accordion-item">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                        <span class="accordion-title">
+                            <i class="fas fa-graduation-cap" style="color: #4CAF50;"></i>
+                            Gestión Académica
+                        </span>
+                        <i class="fas fa-chevron-down accordion-icon"></i>
+                    </div>
+                    <div class="accordion-content">
+                        <ul>
+                            <li><a href="{% url 'alumnos_list' %}"><i class="fas fa-user-graduate"></i> Alumnos</a></li>
+                            <li><a href="{% url 'docentes_list' %}"><i class="fas fa-chalkboard-teacher"></i> Docentes</a></li>
+                            <li><a href="{% url 'gestion_cursos' %}"><i class="fas fa-book"></i> Gestión de Cursos</a></li>
+                            <li><a href="{% url 'admin_calificaciones' %}"><i class="fas fa-star"></i> Calificaciones</a></li>
+                            <li><a href="{% url 'admin_asistencia' %}"><i class="fas fa-clipboard-check"></i> Asistencia</a></li>
+                            <li><a href="{% url 'inscribir_alumno' %}"><i class="fas fa-user-plus"></i> Inscribir Alumno</a></li>
+                        </ul>
+                    </div>
+                </li>
+                
+                <!-- 👨‍👩‍👦 GESTIÓN FAMILIAR -->
+                <li class="accordion-item">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                        <span class="accordion-title">
+                            <i class="fas fa-users" style="color: #2196F3;"></i>
+                            Gestión Familiar
+                        </span>
+                        <i class="fas fa-chevron-down accordion-icon"></i>
+                    </div>
+                    <div class="accordion-content">
+                        <ul>
+                            <li><a href="{% url 'crear_apoderado' %}"><i class="fas fa-user-tie"></i> Apoderados</a></li>
+                            <li><a href="{% url 'asignar_apoderado' %}"><i class="fas fa-link"></i> Asignaciones</a></li>
+                        </ul>
+                    </div>
+                </li>
+                
+                <!-- 🏥 COMPLEMENTARIO -->
+                <li class="accordion-item">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                        <span class="accordion-title">
+                            <i class="fas fa-heartbeat" style="color: #FF9800;"></i>
+                            Complementario
+                        </span>
+                        <i class="fas fa-chevron-down accordion-icon"></i>
+                    </div>
+                    <div class="accordion-content">
+                        <ul>
+                            <li><a href="{% url 'datos_medicos' %}"><i class="fas fa-hospital"></i> Datos Médicos</a></li>
+                            <li><a href="{% url 'datos_academicos' %}"><i class="fas fa-chart-bar"></i> Datos Académicos</a></li>
+                        </ul>
+                    </div>
+                </li>
+                
+                <!-- �️ SISTEMA -->
+                <li class="accordion-item">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                        <span class="accordion-title">
+                            <i class="fas fa-shield-alt" style="color: #9C27B0;"></i>
+                            Sistema
+                        </span>
+                        <i class="fas fa-chevron-down accordion-icon"></i>
+                    </div>
+                    <div class="accordion-content">
+                        <ul>
+                            <li><a href="{% url 'auditoria' %}" class="active"><i class="fas fa-search"></i> Auditoría</a></li>
+                            <li><a href="{% url 'toma_datos' %}"><i class="fas fa-download"></i> Toma de Datos</a></li>
+                        </ul>
+                    </div>
+                </li>
+            </ul>
+            
+            <!-- Logout -->
+            <div class="logout-menu-item">
+                <a href="{% url 'logout' %}"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a>
+            </div>
+        </div>
+
+        <!-- 🔹 CONTENIDO PRINCIPAL -->
+        <div class="main-content">
+            
+            <div class="data-section">
+                <h3><i class="fas fa-shield-alt"></i> Registro de Accesos</h3>
+                <p style="color: rgba(255,255,255,0.8); margin-bottom: 20px;">
+                    Historial de inicios de sesión y actividades del sistema.
+                </p>
+                
+                {% if logs %}
+                <table class="activity-table" style="width: 100%;">
+                    <thead>
+                        <tr>
+                            <th>Fecha/Hora</th>
+                            <th>Usuario</th>
+                            <th>Acción</th>
+                            <th>IP</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for log in logs %}
+                        <tr>
+                            <td>{{ log.0|date:"d/m/Y H:i"|default:log.0 }}</td>
+                            <td>{{ log.1|default:"Anónimo" }}</td>
+                            <td>
+                                {% if 'éxito' in log.2 or 'exitoso' in log.2 %}
+                                    <span style="color: #4CAF50;"><i class="fas fa-check-circle"></i> {{ log.2 }}</span>
+                                {% elif 'fallido' in log.2 or 'Fallido' in log.2 %}
+                                    <span style="color: #f44336;"><i class="fas fa-times-circle"></i> {{ log.2 }}</span>
+                                {% else %}
+                                    {{ log.2 }}
+                                {% endif %}
+                            </td>
+                            <td>{{ log.3|default:"-" }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <div style="text-align: center; padding: 40px; color: rgba(255,255,255,0.6);">
+                    <div style="font-size: 50px; margin-bottom: 15px;"><i class="fas fa-clipboard-list"></i></div>
+                    <p>No hay registros de auditoría disponibles.</p>
+                </div>
+                {% endif %}
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+<script>
+    function toggleAccordion(header) {
+        // Cerrar todos los demás
+        document.querySelectorAll('.accordion-header').forEach(h => {
+            if (h !== header && h.classList.contains('active')) {
+                h.classList.remove('active');
+                h.nextElementSibling.classList.remove('active');
+            }
+        });
+        
+        // Toggle el actual
+        header.classList.toggle('active');
+        header.nextElementSibling.classList.toggle('active');
+    }
+    
+    // Abrir el acordeón de Sistema por defecto (donde está Auditoría)
+    document.addEventListener('DOMContentLoaded', function() {
+        const systemAccordion = document.querySelectorAll('.accordion-header')[3]; // El 4to acordeón (Sistema)
+        if (systemAccordion) {
+            systemAccordion.classList.add('active');
+            systemAccordion.nextElementSibling.classList.add('active');
+        }
+    });
+</script>
+
+</body>
+</html>

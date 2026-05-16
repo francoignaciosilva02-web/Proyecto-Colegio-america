@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background-color: #f5f7fa;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .header {
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            padding: 30px;
+            text-align: center;
+        }
+        .header h1 {
+            color: white;
+            margin: 0;
+            font-size: 24px;
+        }
+        .content {
+            padding: 40px 30px;
+            text-align: center;
+        }
+        .saludo {
+            color: #333;
+            font-size: 20px;
+            margin-bottom: 20px;
+        }
+        .mensaje {
+            color: #666;
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+        .codigo-box {
+            background: #f8f9fa;
+            border: 2px solid #1e3c72;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 30px 0;
+        }
+        .codigo-label {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+        .codigo {
+            color: #1e3c72;
+            font-size: 36px;
+            font-weight: bold;
+            letter-spacing: 8px;
+        }
+        .duracion {
+            color: #e67e22;
+            font-size: 14px;
+            margin-top: 20px;
+            padding: 10px;
+            background: #fff3e0;
+            border-radius: 5px;
+        }
+        .footer {
+            background: #f8f9fa;
+            padding: 20px;
+            text-align: center;
+            color: #999;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Código de Verificación</h1>
+        </div>
+        <div class="content">
+            <p class="saludo">¡Hola, {{ nombre_usuario }}!</p>
+            <p class="mensaje">
+                Hemos detectado que estás verificando tu identidad en nuestra plataforma.<br>
+                Para continuar con el proceso de activación, copia el siguiente código y pégalo en el campo de verificación.
+            </p>
+            <div class="codigo-box">
+                <p class="codigo-label">Tu código de verificación es:</p>
+                <p class="codigo">{{ token }}</p>
+            </div>
+            <p class="duracion">
+                ⏱ Este código es válido por <strong>5 minutos</strong> a partir del envío de este correo.
+            </p>
+        </div>
+        <div class="footer">
+            <p>Si no solicitaste este código, ignora este mensaje.</p>
+        </div>
+    </div>
+</body>
+</html>

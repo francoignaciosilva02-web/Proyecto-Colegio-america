@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Datos Académicos</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <link rel="stylesheet" href="{% static 'css/admin_dashboard.css' %}">
+    <link rel="stylesheet" href="{% static 'css/accordion-menu.css' %}">
+    <link rel="stylesheet" href="{% static 'css/forms.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+</head>
+<body style="align-items: flex-start; padding-top: 30px;">
+
+<div class="dashboard-container" style="max-width: 1400px; width: 95%;">
+
+    <div class="dashboard-header">
+        <div class="header-title">
+            <span class="admin-badge">ADMIN</span>
+            <h1><i class="fas fa-chart-bar"></i> Datos Académicos</h1>
+        </div>
+        <div class="header-user">
+            <span><i class="fas fa-user-shield"></i> {{ email|default:"Administrador" }}</span>
+        </div>
+    </div>
+
+    <div class="admin-layout">
+        <div class="sidebar">
+            <h3><i class="fas fa-database"></i> Panel de Control</h3>
+            
+            <ul class="accordion-menu">
+                <li class="accordion-item">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                        <span class="accordion-title">
+                            <i class="fas fa-graduation-cap" style="color: #4CAF50;"></i>
+                            Gestión Académica
+                        </span>
+                        <i class="fas fa-chevron-down accordion-icon"></i>
+                    </div>
+                    <div class="accordion-content">
+                        <ul>
+                            <li><a href="{% url 'alumnos_list' %}"><i class="fas fa-user-graduate"></i> Alumnos</a></li>
+                            <li><a href="{% url 'docentes_list' %}"><i class="fas fa-chalkboard-teacher"></i> Docentes</a></li>
+                            <li><a href="{% url 'gestion_cursos' %}"><i class="fas fa-book"></i> Gestión de Cursos</a></li>
+                            <li><a href="{% url 'inscribir_alumno' %}"><i class="fas fa-user-plus"></i> Inscribir Alumno</a></li>
+                            <li><a href="{% url 'admin_asistencia' %}"><i class="fas fa-clipboard-check"></i> Asistencia</a></li>
+                        </ul>
+                    </div>
+                </li>
+                
+                <li class="accordion-item">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                        <span class="accordion-title">
+                            <i class="fas fa-users" style="color: #2196F3;"></i>
+                            Gestión Familiar
+                        </span>
+                        <i class="fas fa-chevron-down accordion-icon"></i>
+                    </div>
+                    <div class="accordion-content">
+                        <ul>
+                            <li><a href="{% url 'crear_apoderado' %}"><i class="fas fa-user-tie"></i> Apoderados</a></li>
+                            <li><a href="{% url 'asignar_apoderado' %}"><i class="fas fa-link"></i> Asignaciones</a></li>
+                        </ul>
+                    </div>
+                </li>
+                
+                <li class="accordion-item">
+                    <div class="accordion-header active" onclick="toggleAccordion(this)">
+                        <span class="accordion-title">
+                            <i class="fas fa-heartbeat" style="color: #FF9800;"></i>
+                            Complementario
+                        </span>
+                        <i class="fas fa-chevron-down accordion-icon"></i>
+                    </div>
+                    <div class="accordion-content active">
+                        <ul>
+                            <li><a href="{% url 'datos_medicos' %}"><i class="fas fa-hospital"></i> Datos Médicos</a></li>
+                            <li><a href="{% url 'datos_academicos' %}" class="active"><i class="fas fa-chart-bar"></i> Datos Académicos</a></li>
+                        </ul>
+                    </div>
+                </li>
+                
+                <li class="accordion-item">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                        <span class="accordion-title">
+                            <i class="fas fa-shield-alt" style="color: #9C27B0;"></i>
+                            Sistema
+                        </span>
+                        <i class="fas fa-chevron-down accordion-icon"></i>
+                    </div>
+                    <div class="accordion-content">
+                        <ul>
+                            <li><a href="{% url 'auditoria' %}"><i class="fas fa-search"></i> Auditoría</a></li>
+                            <li><a href="{% url 'toma_datos' %}"><i class="fas fa-download"></i> Toma de Datos</a></li>
+                        </ul>
+                    </div>
+                </li>
+            </ul>
+            
+            <div class="logout-menu-item">
+                <a href="{% url 'logout' %}"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a>
+            </div>
+        </div>
+
+        <div class="main-content">
+            
+            <div class="data-section">
+                <h3><i class="fas fa-chart-bar"></i> Registro de Datos Académicos</h3>
+                
+                {% if mensaje %}
+                <div class="alert success"><i class="fas fa-check-circle"></i> {{ mensaje }}</div>
+                {% endif %}
+
+                {% if error %}
+                <div class="alert error"><i class="fas fa-times-circle"></i> {{ error }}</div>
+                {% endif %}
+
+                <form method="post" class="admin-form">
+                    {% csrf_token %}
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label><i class="fas fa-user-graduate"></i> Alumno</label>
+                            <select name="id_alumno" required>
+                                <option value="">Seleccione un alumno</option>
+                                {% for alumno in alumnos %}
+                                <option value="{{ alumno.0 }}">
+                                    {{ alumno.1 }} {{ alumno.2 }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label><i class="fas fa-school"></i> Colegio Anterior</label>
+                            <input type="text" name="colegio_anterior" placeholder="Nombre del colegio anterior">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label><i class="fas fa-graduation-cap"></i> Estado Académico</label>
+                            <select name="estado_academico">
+                                <option value="Regular">Regular</option>
+                                <option value="Condicional">Condicional</option>
+                                <option value="Repitente">Repitente</option>
+                                <option value="Retirado">Retirado</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label><i class="fas fa-exchange-alt"></i> Motivo Cambio</label>
+                            <input type="text" name="motivo_cambio" placeholder="Motivo del cambio de colegio">
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn-submit">
+                            <i class="fas fa-save"></i> Guardar Datos Académicos
+                        </button>
+                        <a href="{% url 'admin_dashboard' %}" class="btn-cancel">
+                            <i class="fas fa-arrow-left"></i> Volver al Dashboard
+                        </a>
+                    </div>
+                </form>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+<script>
+    function toggleAccordion(header) {
+        document.querySelectorAll('.accordion-header').forEach(h => {
+            if (h !== header && h.classList.contains('active')) {
+                h.classList.remove('active');
+                h.nextElementSibling.classList.remove('active');
+            }
+        });
+        header.classList.toggle('active');
+        header.nextElementSibling.classList.toggle('active');
+    }
+</script>
+
+</body>
+</html>

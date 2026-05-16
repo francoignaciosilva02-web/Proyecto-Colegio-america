@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Calificaciones - Admin</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}?v=4.0">
+    <link rel="stylesheet" href="{% static 'css/admin_dashboard.css' %}?v=4.0">
+    <link rel="stylesheet" href="{% static 'css/accordion-menu.css' %}?v=4.0">
+    <link rel="stylesheet" href="{% static 'css/admin_calificaciones.css' %}?v=4.0">
+    <!-- FontAwesome para iconos reales -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+</head>
+<body>
+
+<div class="admin-layout">
+    <div class="sidebar">
+        <h3><i class="fas fa-database"></i> Panel de Control</h3>
+        
+        <ul class="accordion-menu">
+            <li class="accordion-item">
+                <div class="accordion-header active" onclick="toggleAccordion(this)">
+                    <span class="accordion-title">
+                        <i class="fas fa-graduation-cap" style="color: #4CAF50;"></i>
+                        Gestión Académica
+                    </span>
+                    <i class="fas fa-chevron-down accordion-icon"></i>
+                </div>
+                <div class="accordion-content active">
+                    <ul>
+                        <li><a href="{% url 'alumnos_list' %}"><i class="fas fa-user-graduate"></i> Alumnos</a></li>
+                        <li><a href="{% url 'docentes_list' %}"><i class="fas fa-chalkboard-teacher"></i> Docentes</a></li>
+                        <li><a href="{% url 'gestion_cursos' %}"><i class="fas fa-book"></i> Gestión de Cursos</a></li>
+                        <li><a href="{% url 'admin_calificaciones' %}" class="active"><i class="fas fa-star"></i> Calificaciones</a></li>
+                        <li><a href="{% url 'admin_asistencia' %}"><i class="fas fa-clipboard-check"></i> Asistencia</a></li>
+                        <li><a href="{% url 'inscribir_alumno' %}"><i class="fas fa-user-plus"></i> Inscribir Alumno</a></li>
+                    </ul>
+                </div>
+            </li>
+            
+            <li class="accordion-item">
+                <div class="accordion-header" onclick="toggleAccordion(this)">
+                    <span class="accordion-title">
+                        <i class="fas fa-users" style="color: #2196F3;"></i>
+                        Gestión Familiar
+                    </span>
+                    <i class="fas fa-chevron-down accordion-icon"></i>
+                </div>
+                <div class="accordion-content">
+                    <ul>
+                        <li><a href="{% url 'crear_apoderado' %}"><i class="fas fa-user-tie"></i> Apoderados</a></li>
+                        <li><a href="{% url 'asignar_apoderado' %}"><i class="fas fa-link"></i> Asignaciones</a></li>
+                    </ul>
+                </div>
+            </li>
+            
+            <li class="accordion-item">
+                <div class="accordion-header" onclick="toggleAccordion(this)">
+                    <span class="accordion-title">
+                        <i class="fas fa-heartbeat" style="color: #FF9800;"></i>
+                        Complementario
+                    </span>
+                    <i class="fas fa-chevron-down accordion-icon"></i>
+                </div>
+                <div class="accordion-content">
+                    <ul>
+                        <li><a href="{% url 'datos_medicos' %}"><i class="fas fa-hospital"></i> Datos Médicos</a></li>
+                        <li><a href="{% url 'datos_academicos' %}"><i class="fas fa-chart-bar"></i> Datos Académicos</a></li>
+                    </ul>
+                </div>
+            </li>
+            
+            <li class="accordion-item">
+                <div class="accordion-header" onclick="toggleAccordion(this)">
+                    <span class="accordion-title">
+                        <i class="fas fa-shield-alt" style="color: #9C27B0;"></i>
+                        Sistema
+                    </span>
+                    <i class="fas fa-chevron-down accordion-icon"></i>
+                </div>
+                <div class="accordion-content">
+                    <ul>
+                        <li><a href="{% url 'auditoria' %}"><i class="fas fa-search"></i> Auditoría</a></li>
+                        <li><a href="{% url 'toma_datos' %}"><i class="fas fa-download"></i> Toma de Datos</a></li>
+                    </ul>
+                </div>
+            </li>
+        </ul>
+        
+        <div class="logout-menu-item">
+            <a href="{% url 'logout' %}"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="dashboard-container">
+            <div class="dashboard-header">
+                <div class="header-title">
+                    <span class="admin-badge">ADMIN</span>
+                    <h1><i class="fas fa-star"></i> Calificaciones</h1>
+                </div>
+                <div class="header-user">
+                    <span><i class="fas fa-user-shield"></i> {{ email|default:"Administrador" }}</span>
+                </div>
+            </div>
+
+            <div class="data-section">
+                <h3><i class="fas fa-star"></i> Seleccione un Alumno para Ver Calificaciones</h3>
+                <p style="color: rgba(255,255,255,0.8); margin-bottom: 20px;">
+                    Haga clic en "Seleccionar" para ver y gestionar las calificaciones del alumno.
+                </p>
+
+                {% if alumnos %}
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre</th>
+                            <th>Apellido Paterno</th>
+                            <th>Apellido Materno</th>
+                            <th>Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for alumno in alumnos %}
+                        <tr {% if selected_alumno and selected_alumno == alumno.0 %}style="background: rgba(76, 175, 80, 0.2);"{% endif %}>
+                            <td>{{ alumno.0 }}</td>
+                            <td>{{ alumno.1 }}</td>
+                            <td>{{ alumno.2 }}</td>
+                            <td>{{ alumno.3 }}</td>
+                            <td>
+                                <form method="get" style="display: inline;">
+                                    <input type="hidden" name="id_alumno" value="{{ alumno.0 }}">
+                                    <button type="submit" class="btn-ver-calificaciones">
+                                        <i class="fas fa-eye"></i> Seleccionar
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <div class="empty-state">
+                    <div class="empty-state-icon"><i class="fas fa-user-graduate"></i></div>
+                    <p>No hay alumnos registrados en el sistema</p>
+                </div>
+                {% endif %}
+            </div>
+
+            {% if selected_alumno %}
+            <div class="data-section" style="margin-top: 30px;">
+                <h3><i class="fas fa-book"></i> Calificaciones del Alumno</h3>
+                <p style="color: rgba(255,255,255,0.8); margin-bottom: 20px;">
+                    Gestione las calificaciones del alumno seleccionado.
+                </p>
+
+                {% if libro %}
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Materia</th>
+                            <th>Notas</th>
+                            <th>Promedio</th>
+                            <th>Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for materia, datos in libro.items %}
+                        <tr>
+                            <td>{{ materia }}</td>
+                            <td>
+                                {% for nota in datos.notas %}
+                                    <span class="nota">{{ nota.nota }}</span>
+                                {% endfor %}
+                            </td>
+                            <td class="promedio">{{ datos.promedio }}</td>
+                            <td>
+                                <button class="btn-agregar" onclick="mostrarFormularioAgregar('{{ materia }}')">
+                                    <i class="fas fa-plus"></i> Agregar
+                                </button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <div class="empty-state">
+                    <div class="empty-state-icon"><i class="fas fa-book"></i></div>
+                    <p>No hay calificaciones registradas para este alumno</p>
+                </div>
+                {% endif %}
+
+                <!-- Formulario para agregar calificación -->
+                <div id="formulario-agregar" class="data-section" style="display: none;">
+                    <h3><i class="fas fa-plus-circle"></i> Agregar Calificación</h3>
+                    <form method="post" class="admin-form">
+                        {% csrf_token %}
+                        <input type="hidden" name="id_alumno" value="{{ selected_alumno }}">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Materia</label>
+                                <select name="materia" id="materia-input" required>
+                                    <option value="">Seleccione materia</option>
+                                    {% for materia in materias %}
+                                    <option value="{{ materia.0 }}">{{ materia.1 }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Nota</label>
+                                <input type="number" name="nota" step="0.1" min="1.0" max="7.0" required>
+                            </div>
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" class="btn-submit">
+                                <i class="fas fa-save"></i> Guardar Calificación
+                            </button>
+                            <button type="button" class="btn-cancel" onclick="ocultarFormulario()">
+                                <i class="fas fa-times"></i> Cancelar
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            {% endif %}
+
+        </div>
+    </div>
+
+</div>
+
+<script>
+    function toggleAccordion(header) {
+        // Cerrar todos los demás
+        document.querySelectorAll('.accordion-header').forEach(h => {
+            if (h !== header && h.classList.contains('active')) {
+                h.classList.remove('active');
+                h.nextElementSibling.classList.remove('active');
+            }
+        });
+
+        // Toggle el actual
+        header.classList.toggle('active');
+        header.nextElementSibling.classList.toggle('active');
+    }
+
+    function mostrarFormularioAgregar(materia) {
+        document.getElementById('formulario-agregar').style.display = 'block';
+        // Buscar y seleccionar la materia en el select
+        const select = document.getElementById('materia-input');
+        for (let i = 0; i < select.options.length; i++) {
+            if (select.options[i].text === materia) {
+                select.selectedIndex = i;
+                break;
+            }
+        }
+    }
+
+    function ocultarFormulario() {
+        document.getElementById('formulario-agregar').style.display = 'none';
+        document.getElementById('materia-input').selectedIndex = 0;
+    }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Ver Alumnos - Docente</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/docente_dashboard.css' %}">
+</head>
+<body>
+
+<div class="dashboard-container">
+    <!-- Header -->
+    <div class="dashboard-header">
+        <div class="welcome-section">
+            <h1>👨‍🎓 Ver Alumnos</h1>
+            <p>Docente: {{ nombre_docente }}</p>
+        </div>
+        <div class="user-section">
+            <span class="user-name">👤 {{ nombre_docente }}</span>
+            <a href="{% url 'docente_dashboard' %}" class="logout-btn">Volver al Dashboard</a>
+        </div>
+    </div>
+
+    <!-- Tabla de Alumnos -->
+    <div class="table-card">
+        <h3>📋 Alumnos en mis Cursos</h3>
+        
+        {% if alumnos %}
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Correo</th>
+                    <th>Curso</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for alumno in alumnos %}
+                <tr>
+                    <td>{{ alumno.0 }}</td>
+                    <td>{{ alumno.1 }} {{ alumno.2 }}</td>
+                    <td>{{ alumno.3 }}</td>
+                    <td>{{ alumno.4 }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-state-icon">👨‍🎓</div>
+            <p>No hay alumnos inscritos en sus cursos</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+</body>
+</html>

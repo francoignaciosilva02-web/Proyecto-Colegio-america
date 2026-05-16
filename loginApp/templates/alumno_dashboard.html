@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard Alumno</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+<body>
+
+<div class="admin-layout">
+    <div class="sidebar">
+        <h3>👨‍🎓 Panel Alumno</h3>
+        <p style="color: rgba(255,255,255,0.7); padding: 0 15px;">Hola, {{ nombre_alumno }}</p>
+
+        <ul class="sidebar-menu">
+            <li><a href="{% url 'alumno_dashboard' %}" class="active">📊 Dashboard</a></li>
+            <li><a href="{% url 'logout' %}">🚪 Cerrar Sesión</a></li>
+        </ul>
+    </div>
+
+    <div class="main-content">
+        <h2>📚 Mis Cursos</h2>
+
+        {% if cursos %}
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Curso</th>
+                    <th>Docente</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for curso in cursos %}
+                <tr>
+                    <td>{{ curso.nombre_curso }}</td>
+                    <td>{{ curso.docente }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p>No estás inscrito en ningún curso.</p>
+        {% endif %}
+
+        <h2>📋 Mi Asistencia</h2>
+
+        {% if asistencias %}
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Fecha</th>
+                    <th>Curso</th>
+                    <th>Estado</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for asistencia in asistencias %}
+                <tr>
+                    <td>{{ asistencia.fecha }}</td>
+                    <td>{{ asistencia.nombre_curso }}</td>
+                    <td>{{ asistencia.estado }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p>No hay registros de asistencia.</p>
+        {% endif %}
+    </div>
+</div>
+
+</body>
+</html>

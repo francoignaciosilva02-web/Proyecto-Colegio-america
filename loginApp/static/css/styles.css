@@ -1,0 +1,211 @@
+/* ===== RESET ===== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* ===== BODY ===== */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #4b7fe1 0%, #759bde 50%, #13284f 100%);
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* ===== CONTENEDOR ===== */
+.container {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    padding: 40px;
+    border-radius: 15px;
+    width: 100%;
+    max-width: 360px;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
+
+/* ===== TITULO ===== */
+.container h2 {
+    color: white;
+    margin-bottom: 20px;
+}
+
+/* ===== INPUT GROUP ===== */
+.input-group {
+    margin-bottom: 15px;
+    text-align: left;
+}
+
+.input-group label {
+    color: white;
+    font-size: 14px;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 12px;
+    margin-top: 5px;
+    border-radius: 8px;
+    border: none;
+    outline: none;
+}
+
+/* ===== BOTON ===== */
+button {
+    width: 100%;
+    padding: 12px;
+    margin-top: 10px;
+    background: transparent;
+    border: 2px solid white;
+    color: white;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: 0.3s;
+}
+
+button:hover {
+    background: rgba(255,255,255,0.2);
+}
+
+/* ===== MENSAJES ===== */
+.error {
+    margin-top: 10px;
+    color: #ffb3b3;
+    font-size: 14px;
+}
+
+.success {
+    margin-top: 10px;
+    color: #b3ffcc;
+    font-size: 14px;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 480px) {
+    .container {
+        padding: 25px;
+    }
+
+    .container h2 {
+        font-size: 20px;
+    }
+}
+
+/* ===== LOGIN CONTAINER (para token.html) ===== */
+.login-container {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    padding: 40px;
+    border-radius: 15px;
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
+
+/* ===== TITLE Y SUBTITLE ===== */
+.title h1 {
+    color: white;
+    margin-bottom: 10px;
+    font-size: 28px;
+}
+
+.subtitle {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 16px;
+    margin-bottom: 20px;
+}
+
+/* ===== SECURITY ICON ===== */
+.security-icon {
+    font-size: 48px;
+    margin-bottom: 15px;
+}
+
+/* ===== INFO BOX ===== */
+.info-box {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    padding: 20px;
+    margin: 20px 0;
+    border-left: 4px solid #4CAF50;
+    text-align: left;
+}
+
+.timer {
+    color: #FFD700;
+    font-weight: bold;
+}
+
+/* ===== TOKEN INPUT ===== */
+.token-input {
+    font-size: 24px;
+    letter-spacing: 8px;
+    text-align: center;
+    width: 200px;
+    padding: 15px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-radius: 10px;
+    background: rgba(255,255,255,0.1);
+    color: white;
+    transition: all 0.3s ease;
+}
+
+.token-input:focus {
+    border-color: #4CAF50;
+    background: rgba(255,255,255,0.2);
+    outline: none;
+}
+
+.token-input::placeholder {
+    color: rgba(255,255,255,0.5);
+}
+
+/* ===== FORM GROUP ===== */
+.form-group {
+    margin-bottom: 15px;
+}
+
+/* ===== MESSAGES ===== */
+.messages {
+    margin-top: 20px;
+}
+
+.message {
+    padding: 10px;
+    border-radius: 8px;
+}
+
+.message.error {
+    background: rgba(255, 0, 0, 0.2);
+    color: #ffb3b3;
+}
+
+.message.success {
+    background: rgba(0, 255, 0, 0.2);
+    color: #b3ffcc;
+}
+
+/* ===== HELP LINKS ===== */
+.help-link {
+    margin-top: 20px;
+    font-size: 12px;
+    color: rgba(255,255,255,0.6);
+}
+
+.help-link a {
+    color: #4CAF50;
+    text-decoration: none;
+}
+
+.help-link a:hover {
+    text-decoration: underline;
+}
+
+/* ===== ADMIN DASHBOARD ===== */
+/* Los estilos del dashboard ahora están en admin_dashboard.css
+   Este archivo solo contiene estilos para login y páginas de autenticación */

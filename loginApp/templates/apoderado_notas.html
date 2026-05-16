@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Notas - Apoderado</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/apoderado_dashboard.css' %}">
+</head>
+<body>
+
+<div class="admin-layout">
+    <div class="sidebar">
+        <h3>👨‍👩‍👧‍👦 Panel Apoderado</h3>
+        <p style="color: rgba(255,255,255,0.7); padding: 0 15px;">Hola, {{ nombre_apoderado }}</p>
+
+        <ul class="sidebar-menu">
+            <li><a href="{% url 'apoderado_hijos' %}">👦 Ver Hijos</a></li>
+            <li><a href="{% url 'apoderado_asistencia' %}">📅 Asistencia</a></li>
+            <li><a href="{% url 'apoderado_notas' %}" class="active">📝 Notas</a></li>
+            <li><a href="{% url 'apoderado_medico' %}">🏥 Datos Médicos</a></li>
+            <li><a href="{% url 'logout' %}">🚪 Cerrar Sesión</a></li>
+        </ul>
+    </div>
+
+    <div class="main-content">
+        <h2>📝 Notas de Mis Hijos</h2>
+
+        {% if notas %}
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Alumno</th>
+                    <th>Curso</th>
+                    <th>Asignatura</th>
+                    <th>Nota</th>
+                    <th>Fecha Evaluación</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for nota in notas %}
+                <tr>
+                    <td>{{ nota.0 }} {{ nota.1 }} {{ nota.2 }}</td>
+                    <td>{{ nota.5|default:"--" }}</td>
+                    <td>{{ nota.6|default:"--" }}</td>
+                    <td>
+                        {% if nota.3 >= 4.0 %}
+                            <span style="color: #4CAF50; font-weight: bold;">{{ nota.3 }}</span>
+                        {% elif nota.3 >= 3.0 %}
+                            <span style="color: #ff9800; font-weight: bold;">{{ nota.3 }}</span>
+                        {% else %}
+                            <span style="color: #f44336; font-weight: bold;">{{ nota.3 }}</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ nota.4|date:"d/m/Y"|default:"--" }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p>No hay registros de notas.</p>
+        {% endif %}
+    </div>
+</div>
+
+</body>
+</html>

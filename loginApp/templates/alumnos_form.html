@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Formulario Alumno</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <link rel="stylesheet" href="{% static 'css/alumnos_form.css' %}">
+</head>
+<body>
+
+<div class="form-container">
+    <h2>👨‍🎓 Formulario Alumno</h2>
+
+    <form method="post">
+        {% csrf_token %}
+
+        <div class="form-grid">
+            <div class="form-group">
+                <label>RUT Número</label>
+                <input type="text" name="rut_numero" placeholder="12345678" value="{{ alumno.rut_numero }}">
+            </div>
+            <div class="form-group">
+                <label>DV</label>
+                <input type="text" name="dv" placeholder="K" maxlength="1" value="{{ alumno.dv }}">
+            </div>
+            <div class="form-group">
+                <label>Nombre</label>
+                <input type="text" name="nombre" placeholder="Nombre" value="{{ alumno.nombre }}">
+            </div>
+            <div class="form-group">
+                <label>Apellido Paterno</label>
+                <input type="text" name="apellido_paterno" placeholder="Apellido Paterno" value="{{ alumno.apellido_paterno }}">
+            </div>
+            <div class="form-group">
+                <label>Apellido Materno</label>
+                <input type="text" name="apellido_materno" placeholder="Apellido Materno" value="{{ alumno.apellido_materno }}">
+            </div>
+            <div class="form-group">
+                <label>Fecha Nacimiento</label>
+                <input type="date" name="fecha_nacimiento" value="{{ alumno.fecha_nacimiento }}">
+            </div>
+            <div class="form-group">
+                <label>Género</label>
+                <select name="genero">
+                    <option value="M" {% if alumno.genero == 'M' %}selected{% endif %}>Masculino</option>
+                    <option value="F" {% if alumno.genero == 'F' %}selected{% endif %}>Femenino</option>
+                    <option value="F" {% if alumno.genero == 'N' %}selected{% endif %}>Prefiero no decirlo</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Nacionalidad</label>
+                <select name="nacionalidad" required>
+                    <option value="">Seleccione</option>
+                    <option value="Chilena" {% if alumno.nacionalidad == 'Chilena' %}selected{% endif %}>Chilena</option>
+                    <option value="Argentina" {% if alumno.nacionalidad == 'Argentina' %}selected{% endif %}>Argentina</option>
+                    <option value="Peruana" {% if alumno.nacionalidad == 'Peruana' %}selected{% endif %}>Peruana</option>
+                    <option value="Venezolana" {% if alumno.nacionalidad == 'Venezolana' %}selected{% endif %}>Venezolana</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Calle</label>
+                <input type="text" name="calle" placeholder="Calle" value="{{ alumno.calle }}">
+            </div>
+            <div class="form-group">
+                <label>Número</label>
+                <input type="text" name="numero" placeholder="Número" value="{{ alumno.numero }}">
+            </div>
+            <div class="form-group">
+                <label>Región</label>
+                <select name="region" required>
+                    <option value="">Seleccione</option>
+                    <option value="RM" {% if alumno.region == 'RM' %}selected{% endif %}>Región Metropolitana</option>
+                    <option value="V" {% if alumno.region == 'V' %}selected{% endif %}>Región de Valparaíso</option>
+                    <option value="IX" {% if alumno.region == 'IX' %}selected{% endif %}>Región de La Araucanía</option>
+                    <option value="II" {% if alumno.region == 'II' %}selected{% endif %}>Región de Antofagasta</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Comuna</label>
+                <select name="comuna" required>
+                    <option value="">Seleccione</option>
+                    <option value="Santiago" {% if alumno.comuna == 'Santiago' %}selected{% endif %}>Santiago</option>
+                    <option value="Valparaíso" {% if alumno.comuna == 'Valparaíso' %}selected{% endif %}>Valparaíso</option>
+                    <option value="Temuco" {% if alumno.comuna == 'Temuco' %}selected{% endif %}>Temuco</option>
+                    <option value="Antofagasta" {% if alumno.comuna == 'Antofagasta' %}selected{% endif %}>Antofagasta</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>Correo</label>
+                <input type="email" name="email" placeholder="Correo" value="{{ alumno.email }}">
+            </div>
+            <div class="form-group full-width">
+                <label>Teléfono</label>
+                <input type="text" name="fono" placeholder="Teléfono" value="{{ alumno.fono }}">
+            </div>
+        </div>
+
+        <div class="btn-group">
+            <button type="submit" class="btn-submit">💾 Guardar</button>
+            <a href="{% url 'alumnos_list' %}" class="btn-cancel">❌ Cancelar</a>
+        </div>
+    </form>
+</div>
+
+</body>
+</html>

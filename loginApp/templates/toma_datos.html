@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Toma de Datos</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}?v=4.0">
+    <link rel="stylesheet" href="{% static 'css/admin_dashboard.css' %}?v=4.0">
+    <link rel="stylesheet" href="{% static 'css/accordion-menu.css' %}?v=4.0">
+    <!-- FontAwesome para iconos reales -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+</head>
+<body>
+
+<div class="dashboard-container" style="max-width: 1400px; width: 95%;">
+
+    <div class="dashboard-header">
+        <div class="header-title">
+            <span class="admin-badge">ADMIN</span>
+            <h1><i class="fas fa-download"></i> Toma de Datos</h1>
+        </div>
+        <div class="header-user">
+            <span><i class="fas fa-user-shield"></i> {{ email|default:"Administrador" }}</span>
+        </div>
+    </div>
+
+    <div class="admin-layout">
+        <!-- 🔹 MENÚ LATERAL ACORDEÓN -->
+        <div class="sidebar">
+            <h3><i class="fas fa-database"></i> Panel de Control</h3>
+            
+            <ul class="accordion-menu">
+                <!-- 📚 GESTIÓN ACADÉMICA -->
+                <li class="accordion-item">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                        <span class="accordion-title">
+                            <i class="fas fa-graduation-cap" style="color: #4CAF50;"></i>
+                            Gestión Académica
+                        </span>
+                        <i class="fas fa-chevron-down accordion-icon"></i>
+                    </div>
+                    <div class="accordion-content">
+                        <ul>
+                            <li><a href="{% url 'alumnos_list' %}"><i class="fas fa-user-graduate"></i> Alumnos</a></li>
+                            <li><a href="{% url 'docentes_list' %}"><i class="fas fa-chalkboard-teacher"></i> Docentes</a></li>
+                            <li><a href="{% url 'gestion_cursos' %}"><i class="fas fa-book"></i> Gestión de Cursos</a></li>
+                            <li><a href="{% url 'admin_calificaciones' %}"><i class="fas fa-star"></i> Calificaciones</a></li>
+                            <li><a href="{% url 'admin_asistencia' %}"><i class="fas fa-clipboard-check"></i> Asistencia</a></li>
+                            <li><a href="{% url 'inscribir_alumno' %}"><i class="fas fa-user-plus"></i> Inscribir Alumno</a></li>
+                        </ul>
+                    </div>
+                </li>
+                
+                <!-- �‍👩‍👦 GESTIÓN FAMILIAR -->
+                <li class="accordion-item">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                        <span class="accordion-title">
+                            <i class="fas fa-users" style="color: #2196F3;"></i>
+                            Gestión Familiar
+                        </span>
+                        <i class="fas fa-chevron-down accordion-icon"></i>
+                    </div>
+                    <div class="accordion-content">
+                        <ul>
+                            <li><a href="{% url 'crear_apoderado' %}"><i class="fas fa-user-tie"></i> Apoderados</a></li>
+                            <li><a href="{% url 'asignar_apoderado' %}"><i class="fas fa-link"></i> Asignaciones</a></li>
+                        </ul>
+                    </div>
+                </li>
+                
+                <!-- 🏥 COMPLEMENTARIO -->
+                <li class="accordion-item">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                        <span class="accordion-title">
+                            <i class="fas fa-heartbeat" style="color: #FF9800;"></i>
+                            Complementario
+                        </span>
+                        <i class="fas fa-chevron-down accordion-icon"></i>
+                    </div>
+                    <div class="accordion-content">
+                        <ul>
+                            <li><a href="{% url 'datos_medicos' %}"><i class="fas fa-hospital"></i> Datos Médicos</a></li>
+                            <li><a href="{% url 'datos_academicos' %}"><i class="fas fa-chart-bar"></i> Datos Académicos</a></li>
+                        </ul>
+                    </div>
+                </li>
+                
+                <!-- �️ SISTEMA -->
+                <li class="accordion-item">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                        <span class="accordion-title">
+                            <i class="fas fa-shield-alt" style="color: #9C27B0;"></i>
+                            Sistema
+                        </span>
+                        <i class="fas fa-chevron-down accordion-icon"></i>
+                    </div>
+                    <div class="accordion-content">
+                        <ul>
+                            <li><a href="{% url 'auditoria' %}"><i class="fas fa-search"></i> Auditoría</a></li>
+                            <li><a href="{% url 'toma_datos' %}" class="active"><i class="fas fa-download"></i> Toma de Datos</a></li>
+                        </ul>
+                    </div>
+                </li>
+            </ul>
+            
+            <!-- Logout -->
+            <div class="logout-menu-item">
+                <a href="{% url 'logout' %}"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a>
+            </div>
+        </div>
+
+        <!-- 🔹 CONTENIDO PRINCIPAL -->
+        <div class="main-content">
+
+            <!-- Resumen General -->
+            <div class="data-section">
+                <h3><i class="fas fa-chart-pie"></i> Resumen General</h3>
+                <div class="data-grid">
+                    <div class="data-item">
+                        <h4><i class="fas fa-user-graduate" style="color: #4CAF50;"></i> Alumnos</h4>
+                        <p>{{ total_alumnos }}</p>
+                    </div>
+                    <div class="data-item">
+                        <h4><i class="fas fa-chalkboard-teacher" style="color: #2196F3;"></i> Docentes</h4>
+                        <p>{{ total_docentes }}</p>
+                    </div>
+                    <div class="data-item">
+                        <h4><i class="fas fa-user-plus" style="color: #9C27B0;"></i> Inscripciones</h4>
+                        <p>{{ total_inscripciones }}</p>
+                    </div>
+                    <div class="data-item">
+                        <h4><i class="fas fa-clipboard-check" style="color: #00BCD4;"></i> Asistencias</h4>
+                        <p>{{ total_asistencias }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Exportar Datos -->
+            <div class="data-section">
+                <h3><i class="fas fa-file-export"></i> Exportar Datos</h3>
+                <p style="color: var(--text-secondary); margin-bottom: 15px;">
+                    Desde esta sección puedes exportar toda la información del sistema.
+                </p>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <button class="btn-submit" style="background: var(--success-color);">
+                        <i class="fas fa-file-csv"></i> Exportar Alumnos
+                    </button>
+                    <button class="btn-submit" style="background: var(--secondary-color);">
+                        <i class="fas fa-file-csv"></i> Exportar Docentes
+                    </button>
+                    <button class="btn-submit" style="background: var(--warning-color);">
+                        <i class="fas fa-file-csv"></i> Exportar Cursos
+                    </button>
+                    <button class="btn-submit" style="background: var(--primary-color);">
+                        <i class="fas fa-file-csv"></i> Exportar Asistencias
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+<script>
+    function toggleAccordion(header) {
+        // Cerrar todos los demás
+        document.querySelectorAll('.accordion-header').forEach(h => {
+            if (h !== header && h.classList.contains('active')) {
+                h.classList.remove('active');
+                h.nextElementSibling.classList.remove('active');
+            }
+        });
+        
+        // Toggle el actual
+        header.classList.toggle('active');
+        header.nextElementSibling.classList.toggle('active');
+    }
+    
+    // Abrir el primer acordeón por defecto
+    document.addEventListener('DOMContentLoaded', function() {
+        const firstAccordion = document.querySelector('.accordion-header');
+        if (firstAccordion) {
+            firstAccordion.classList.add('active');
+            firstAccordion.nextElementSibling.classList.add('active');
+        }
+    });
+</script>
+
+</body>
+</html>

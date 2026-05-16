@@ -1,0 +1,93 @@
+/* Estilos para el formulario de cursos */
+body {
+    min-height: 100vh;
+    align-items: flex-start;
+    padding-top: 30px;
+}
+.form-container {
+    width: 95%;
+    max-width: 800px;
+    margin: 0 auto;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border-radius: 15px;
+    padding: 40px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+}
+.form-container h2 {
+    color: white;
+    margin-bottom: 30px;
+    font-size: 24px;
+    text-align: center;
+}
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+}
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+.form-group.full-width {
+    grid-column: span 2;
+}
+.form-group label {
+    color: rgba(255,255,255,0.8);
+    font-size: 14px;
+    margin-bottom: 5px;
+}
+.form-group input,
+.form-group select {
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.3);
+    background: rgba(255,255,255,0.1);
+    color: white;
+    font-size: 14px;
+    outline: none;
+}
+.form-group input:focus,
+.form-group select:focus {
+    border-color: #4CAF50;
+    background: rgba(255,255,255,0.15);
+}
+.form-group input::placeholder {
+    color: rgba(255,255,255,0.5);
+}
+.form-group select option {
+    background: #2a5298;
+    color: white;
+}
+.btn-group {
+    display: flex;
+    gap: 15px;
+    margin-top: 25px;
+    justify-content: center;
+}
+.btn-submit {
+    padding: 12px 30px;
+    background: rgba(76, 175, 80, 0.5);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: 0.3s;
+}
+.btn-submit:hover {
+    background: rgba(76, 175, 80, 0.7);
+}
+.btn-cancel {
+    padding: 12px 30px;
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    border: 1px solid rgba(255,255,255,0.3);
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 16px;
+    transition: 0.3s;
+}
+.btn-cancel:hover {
+    background: rgba(255,255,255,0.2);
+}

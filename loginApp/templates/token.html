@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verificación de Código - Escuela America</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/token.css' %}">
+</head>
+<body>
+
+<div class="card">
+    <h2>Verificación de Código</h2>
+    
+    <p>Hemos enviado un código de verificación a tu correo electrónico.<br>
+    El código expira en <span class="timer">5 minutos</span>.</p>
+
+    <form method="post" action="/token/">
+        {% csrf_token %}
+
+        <div class="input-group">
+            <label>Código de verificación</label>
+            <input type="text" name="token" placeholder="Ingresa el código de 6 dígitos" maxlength="6" required pattern="[0-9]{6}">
+        </div>
+
+        <button type="submit">Verificar</button>
+    </form>
+
+    {% if error %}
+        <p class="error">{{ error }}</p>
+    {% endif %}
+    
+    <a href="/" class="back-link">Volver al login</a>
+</div>
+
+</body>
+</html>

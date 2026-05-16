@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Panel Docente</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/docente_dashboard.css' %}">
+</head>
+<body>
+
+<div class="dashboard-container">
+    <!-- Header -->
+    <div class="dashboard-header">
+        <div class="welcome-section">
+            <h1>👨‍🏫 Bienvenido, {{ nombre_docente }}</h1>
+            <p>Sistema de Gestión Académica</p>
+        </div>
+        <div class="user-section">
+            <span class="user-name">👤 {{ nombre_docente }}</span>
+            <a href="{% url 'logout' %}" class="logout-btn">Cerrar Sesión</a>
+        </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="stats-grid" style="grid-template-columns: repeat(3, 1fr);">
+        <div class="stat-card cursos">
+            <div class="stat-icon">📚</div>
+            <div class="stat-number">{{ total_cursos }}</div>
+            <div class="stat-label">Cursos Asignados</div>
+            <div class="stat-detail">{% if total_cursos == 1 %}1 curso activo{% else %}{{ total_cursos }} cursos activos{% endif %}</div>
+        </div>
+
+        <div class="stat-card alumnos">
+            <div class="stat-icon">👨‍🎓</div>
+            <div class="stat-number">{{ total_alumnos }}</div>
+            <div class="stat-label">Total Alumnos</div>
+            <div class="stat-detail">alumnos inscritos</div>
+        </div>
+
+        <div class="stat-card asistencia">
+            <div class="stat-icon">📅</div>
+            <div class="stat-number">{{ presentes_hoy }}</div>
+            <div class="stat-label">Asistencia Hoy</div>
+            <div class="stat-detail">{{ total_asistencias_hoy }} registros totales</div>
+        </div>
+    </div>
+
+    <!-- Actions Section -->
+    <div class="actions-section">
+        <h3 class="actions-title">🚀 Acciones Rápidas</h3>
+        <div class="actions-grid">
+            <a href="{% url 'docente_pasar_asistencia' %}" class="action-btn">
+                <span>✓</span>
+                <span>Pasar Asistencia</span>
+            </a>
+            <a href="{% url 'docente_ver_alumnos' %}" class="action-btn secondary">
+                <span>👨‍🎓</span>
+                <span>Ver Alumnos</span>
+            </a>
+            <a href="{% url 'docente_ver_asistencia' %}" class="action-btn info">
+                <span>📝</span>
+                <span>Ver Asistencia</span>
+            </a>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

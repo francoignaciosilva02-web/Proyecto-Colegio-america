@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Datos Médicos - Apoderado</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/apoderado_dashboard.css' %}">
+</head>
+<body>
+
+<div class="admin-layout">
+    <div class="sidebar">
+        <h3>👨‍👩‍👧‍👦 Panel Apoderado</h3>
+        <p style="color: rgba(255,255,255,0.7); padding: 0 15px;">Hola, {{ nombre_apoderado }}</p>
+
+        <ul class="sidebar-menu">
+            <li><a href="{% url 'apoderado_hijos' %}">👦 Ver Hijos</a></li>
+            <li><a href="{% url 'apoderado_asistencia' %}">📅 Asistencia</a></li>
+            <li><a href="{% url 'apoderado_notas' %}">📝 Notas</a></li>
+            <li><a href="{% url 'apoderado_medico' %}" class="active">🏥 Datos Médicos</a></li>
+            <li><a href="{% url 'logout' %}">🚪 Cerrar Sesión</a></li>
+        </ul>
+    </div>
+
+    <div class="main-content">
+        <h2>🏥 Datos Médicos de Mis Hijos</h2>
+
+        {% if datos_medicos %}
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Alumno</th>
+                    <th>Alergias</th>
+                    <th>Enfermedades Crónicas</th>
+                    <th>Medicamentos</th>
+                    <th>Contacto Emergencia</th>
+                    <th>Teléfono Emergencia</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for dm in datos_medicos %}
+                <tr>
+                    <td>{{ dm.0 }} {{ dm.1 }} {{ dm.2 }}</td>
+                    <td>{{ dm.3|default:"Ninguna" }}</td>
+                    <td>{{ dm.4|default:"Ninguna" }}</td>
+                    <td>{{ dm.5|default:"Ninguno" }}</td>
+                    <td>{{ dm.6|default:"--" }}</td>
+                    <td>{{ dm.7|default:"--" }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p>No hay datos médicos registrados.</p>
+        {% endif %}
+    </div>
+</div>
+
+</body>
+</html>

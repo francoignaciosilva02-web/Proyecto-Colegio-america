@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Asistencia - Apoderado</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/apoderado_dashboard.css' %}">
+</head>
+<body>
+
+<div class="admin-layout">
+    <div class="sidebar">
+        <h3>👨‍👩‍👧‍👦 Panel Apoderado</h3>
+        <p style="color: rgba(255,255,255,0.7); padding: 0 15px;">Hola, {{ nombre_apoderado }}</p>
+
+        <ul class="sidebar-menu">
+            <li><a href="{% url 'apoderado_hijos' %}">👦 Ver Hijos</a></li>
+            <li><a href="{% url 'apoderado_asistencia' %}" class="active">📅 Asistencia</a></li>
+            <li><a href="{% url 'apoderado_notas' %}">📝 Notas</a></li>
+            <li><a href="{% url 'apoderado_medico' %}">🏥 Datos Médicos</a></li>
+            <li><a href="{% url 'logout' %}">🚪 Cerrar Sesión</a></li>
+        </ul>
+    </div>
+
+    <div class="main-content">
+        <h2>📅 Asistencia de Mis Hijos</h2>
+
+        {% if asistencias %}
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Alumno</th>
+                    <th>Curso</th>
+                    <th>Fecha</th>
+                    <th>Estado</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for asis in asistencias %}
+                <tr>
+                    <td>{{ asis.0 }} {{ asis.1 }} {{ asis.2 }}</td>
+                    <td>{{ asis.5|default:"--" }}</td>
+                    <td>{{ asis.3|date:"d/m/Y"|default:"--" }}</td>
+                    <td>
+                        {% if asis.4 == 'Presente' %}
+                            <span style="color: #4CAF50;">✅ Presente</span>
+                        {% elif asis.4 == 'Ausente' %}
+                            <span style="color: #f44336;">❌ Ausente</span>
+                        {% elif asis.4 == 'Justificado' %}
+                            <span style="color: #ff9800;">⚠️ Justificado</span>
+                        {% else %}
+                            {{ asis.4|default:"--" }}
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p>No hay registros de asistencia.</p>
+        {% endif %}
+    </div>
+</div>
+
+</body>
+</html>

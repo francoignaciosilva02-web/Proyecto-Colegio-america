@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard Apoderado</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/apoderado_dashboard.css' %}">
+</head>
+<body>
+
+<div class="admin-layout">
+    <div class="sidebar">
+        <h3>👨‍👩‍👧‍👦 Panel Apoderado</h3>
+        <p style="color: rgba(255,255,255,0.7); padding: 0 15px;">Hola, {{ nombre_apoderado }}</p>
+
+        <ul class="sidebar-menu">
+            <li><a href="{% url 'apoderado_hijos' %}" class="active"> Ver Hijos</a></li>
+            <li><a href="{% url 'apoderado_asistencia' %}">📅 Asistencia</a></li>
+            <li><a href="{% url 'apoderado_notas' %}">📝 Notas</a></li>
+            <li><a href="{% url 'apoderado_medico' %}">🏥 Datos Médicos</a></li>
+            <li><a href="{% url 'logout' %}">🚪 Cerrar Sesión</a></li>
+        </ul>
+    </div>
+
+    <div class="main-content">
+        <h2>👨‍🎓 Alumnos a Cargo</h2>
+
+        {% if alumnos %}
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Curso</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for alumno in alumnos %}
+                <tr>
+                    <td>{{ alumno.id_alumno }}</td>
+                    <td>{{ alumno.nombre }} {{ alumno.apellido_paterno }} {{ alumno.apellido_materno }}</td>
+                    <td>{{ alumno.nombre_curso|default:"Sin curso" }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p>No tienes alumnos asignados.</p>
+        {% endif %}
+    </div>
+</div>
+
+</body>
+</html>

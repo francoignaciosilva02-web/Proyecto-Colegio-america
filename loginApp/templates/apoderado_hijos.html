@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Mis Hijos - Apoderado</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/apoderado_dashboard.css' %}">
+</head>
+<body>
+
+<div class="admin-layout">
+    <div class="sidebar">
+        <h3>👨‍👩‍👧‍👦 Panel Apoderado</h3>
+        <p style="color: rgba(255,255,255,0.7); padding: 0 15px;">Hola, {{ nombre_apoderado }}</p>
+
+        <ul class="sidebar-menu">
+            <li><a href="{% url 'apoderado_hijos' %}" class="active">👦 Ver Hijos</a></li>
+            <li><a href="{% url 'apoderado_asistencia' %}">📅 Asistencia</a></li>
+            <li><a href="{% url 'apoderado_notas' %}">📝 Notas</a></li>
+            <li><a href="{% url 'apoderado_medico' %}">🏥 Datos Médicos</a></li>
+            <li><a href="{% url 'logout' %}">🚪 Cerrar Sesión</a></li>
+        </ul>
+    </div>
+
+    <div class="main-content">
+        <h2>👦 Mis Hijos</h2>
+
+        {% if hijos %}
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre Completo</th>
+                    <th>Fecha Nacimiento</th>
+                    <th>Género</th>
+                    <th>Email</th>
+                    <th>Teléfono</th>
+                    <th>Curso</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for hijo in hijos %}
+                <tr>
+                    <td>{{ hijo.0 }}</td>
+                    <td>{{ hijo.1 }} {{ hijo.2 }} {{ hijo.3 }}</td>
+                    <td>{{ hijo.4|date:"d/m/Y"|default:"--" }}</td>
+                    <td>{{ hijo.5|default:"--" }}</td>
+                    <td>{{ hijo.6|default:"--" }}</td>
+                    <td>{{ hijo.7|default:"--" }}</td>
+                    <td>{{ hijo.8|default:"Sin curso" }} {{ hijo.9|default:"" }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p>No tienes hijos asignados.</p>
+        {% endif %}
+    </div>
+</div>
+
+</body>
+</html>

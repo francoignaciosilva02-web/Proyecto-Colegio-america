@@ -1,0 +1,21 @@
+<h2>Inscribir Alumno</h2>
+
+<form method="post">
+    {% csrf_token %}
+
+    <label>Alumno:</label>
+    <select name="id_alumno">
+        {% for a in alumnos %}
+        <option value="{{ a.id_alumno }}">{{ a.nombre }}</option>
+        {% endfor %}
+    </select><br><br>
+
+    <label>Curso:</label>
+    <select name="id_curso">
+        {% for c in cursos %}
+        <option value="{{ c.id_curso }}">{{ c.nombre_curso }}</option>
+        {% endfor %}
+    </select><br><br>
+
+    <button type="submit">Inscribir</button>
+</form>

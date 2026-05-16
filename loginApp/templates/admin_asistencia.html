@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Control de Asistencia - Admin</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}?v=4.0">
+    <link rel="stylesheet" href="{% static 'css/admin_dashboard.css' %}?v=4.0">
+    <link rel="stylesheet" href="{% static 'css/accordion-menu.css' %}?v=4.0">
+    <link rel="stylesheet" href="{% static 'css/admin_asistencia.css' %}?v=4.0">
+    <!-- FontAwesome para iconos reales -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+</head>
+<body>
+
+<div class="admin-layout">
+    <div class="sidebar">
+        <h3><i class="fas fa-database"></i> Panel de Control</h3>
+
+        <ul class="accordion-menu">
+            <li class="accordion-item">
+                <div class="accordion-header" onclick="toggleAccordion(this)">
+                    <span class="accordion-title">
+                        <i class="fas fa-graduation-cap" style="color: #4CAF50;"></i>
+                        Gestión Académica
+                    </span>
+                    <i class="fas fa-chevron-down accordion-icon"></i>
+                </div>
+                <div class="accordion-content">
+                    <ul>
+                        <li><a href="{% url 'alumnos_list' %}"><i class="fas fa-user-graduate"></i> Alumnos</a></li>
+                        <li><a href="{% url 'docentes_list' %}"><i class="fas fa-chalkboard-teacher"></i> Docentes</a></li>
+                        <li><a href="{% url 'gestion_cursos' %}"><i class="fas fa-book"></i> Gestión de Cursos</a></li>
+                        <li><a href="{% url 'admin_calificaciones' %}"><i class="fas fa-star"></i> Calificaciones</a></li>
+                        <li><a href="{% url 'admin_asistencia' %}" class="active"><i class="fas fa-clipboard-check"></i> Asistencia</a></li>
+                        <li><a href="{% url 'inscribir_alumno' %}"><i class="fas fa-user-plus"></i> Inscribir Alumno</a></li>
+                    </ul>
+                </div>
+            </li>
+
+            <li class="accordion-item">
+                <div class="accordion-header" onclick="toggleAccordion(this)">
+                    <span class="accordion-title">
+                        <i class="fas fa-users" style="color: #2196F3;"></i>
+                        Gestión Familiar
+                    </span>
+                    <i class="fas fa-chevron-down accordion-icon"></i>
+                </div>
+                <div class="accordion-content">
+                    <ul>
+                        <li><a href="{% url 'crear_apoderado' %}"><i class="fas fa-user-tie"></i> Apoderados</a></li>
+                        <li><a href="{% url 'asignar_apoderado' %}"><i class="fas fa-link"></i> Asignaciones</a></li>
+                    </ul>
+                </div>
+            </li>
+
+            <li class="accordion-item">
+                <div class="accordion-header" onclick="toggleAccordion(this)">
+                    <span class="accordion-title">
+                        <i class="fas fa-heartbeat" style="color: #FF9800;"></i>
+                        Complementario
+                    </span>
+                    <i class="fas fa-chevron-down accordion-icon"></i>
+                </div>
+                <div class="accordion-content">
+                    <ul>
+                        <li><a href="{% url 'datos_medicos' %}"><i class="fas fa-hospital"></i> Datos Médicos</a></li>
+                        <li><a href="{% url 'datos_academicos' %}"><i class="fas fa-chart-bar"></i> Datos Académicos</a></li>
+                    </ul>
+                </div>
+            </li>
+
+            <li class="accordion-item">
+                <div class="accordion-header" onclick="toggleAccordion(this)">
+                    <span class="accordion-title">
+                        <i class="fas fa-shield-alt" style="color: #9C27B0;"></i>
+                        Sistema
+                    </span>
+                    <i class="fas fa-chevron-down accordion-icon"></i>
+                </div>
+                <div class="accordion-content">
+                    <ul>
+                        <li><a href="{% url 'auditoria' %}"><i class="fas fa-search"></i> Auditoría</a></li>
+                        <li><a href="{% url 'toma_datos' %}"><i class="fas fa-download"></i> Toma de Datos</a></li>
+                    </ul>
+                </div>
+            </li>
+        </ul>
+
+        <div class="logout-menu-item">
+            <a href="{% url 'logout' %}"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="dashboard-container">
+            <div class="dashboard-header">
+                <div class="header-title">
+                    <span class="admin-badge">ADMIN</span>
+                    <h1><i class="fas fa-clipboard-check"></i> Control de Asistencia</h1>
+                </div>
+                <div class="header-user">
+                    <span><i class="fas fa-user-shield"></i> {{ email|default:"Administrador" }}</span>
+                </div>
+            </div>
+
+            <!-- Selección de Curso -->
+            <div class="data-section">
+                <h3><i class="fas fa-book"></i> Seleccionar Curso</h3>
+                <form method="GET" class="admin-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="curso-select">Curso:</label>
+                            <select name="id_curso" id="curso-select" required>
+                                <option value="">Seleccione un curso</option>
+                                {% for curso in cursos %}
+                                    <option value="{{ curso.0 }}" {% if request.GET.id_curso == curso.0|stringformat:"s" %}selected{% endif %}>
+                                        {{ curso.1 }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group" style="display: flex; align-items: flex-end;">
+                            <button type="submit" class="btn-submit">
+                                <i class="fas fa-check"></i> Aceptar
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            {% if alumnos %}
+            <!-- Información del Curso -->
+            <div class="data-section">
+                <h3><i class="fas fa-info-circle"></i> Información del Curso</h3>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <strong>Curso:</strong> {{ nombre_curso }}
+                    </div>
+                    <div class="info-item">
+                        <strong>Profesor:</strong> {{ profesor }}
+                    </div>
+                    <div class="info-item">
+                        <strong>Fecha:</strong> {{ fecha }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Asistencias Registradas -->
+            {% if asistencias %}
+            <div class="data-section">
+                <h3><i class="fas fa-clipboard-check"></i> Asistencias Registradas</h3>
+                <table class="tabla-asistencia">
+                    <thead>
+                        <tr>
+                            <th>N°</th>
+                            <th>Alumno</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for alumno in asistencias %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td>{{ alumno.nombre }} {{ alumno.apellido_paterno }} {{ alumno.apellido_materno }}</td>
+                            <td>
+                                {% if alumno.estado == "P" %}
+                                    🟢 Presente
+                                {% elif alumno.estado == "A" %}
+                                    🔴 Ausente
+                                {% elif alumno.estado == "T" %}
+                                    🟡 Tarde
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% endif %}
+
+            <!-- Formulario de Asistencia -->
+            <div class="data-section">
+                <h3><i class="fas fa-edit"></i> Registrar/Editar Asistencia</h3>
+                <form method="POST" class="admin-form">
+                    {% csrf_token %}
+                    <input type="hidden" name="fecha" value="{{ fecha }}">
+
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>N°</th>
+                                <th>Alumno</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for alumno in alumnos %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ alumno.1 }} {{ alumno.2 }} {{ alumno.3 }}</td>
+                                <td>
+                                    <select name="estado_{{ alumno.0 }}" class="estado-select">
+                                        <option value="P">🟢 Presente</option>
+                                        <option value="A">🔴 Ausente</option>
+                                        <option value="T">🟡 Tarde</option>
+                                    </select>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn-submit">
+                            <i class="fas fa-save"></i> Guardar Asistencia
+                        </button>
+                    </div>
+                </form>
+            </div>
+            {% endif %}
+
+        </div>
+    </div>
+</div>
+
+<script>
+    function toggleAccordion(header) {
+        // Cerrar todos los demás
+        document.querySelectorAll('.accordion-header').forEach(h => {
+            if (h !== header && h.classList.contains('active')) {
+                h.classList.remove('active');
+                h.nextElementSibling.classList.remove('active');
+            }
+        });
+
+        // Toggle el actual
+        header.classList.toggle('active');
+        header.nextElementSibling.classList.toggle('active');
+    }
+</script>
+
+</body>
+</html>

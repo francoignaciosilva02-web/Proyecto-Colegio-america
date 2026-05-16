@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Ver Asistencia - Docente</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/docente_dashboard.css' %}">
+</head>
+<body>
+
+<div class="dashboard-container">
+    <!-- Header -->
+    <div class="dashboard-header">
+        <div class="welcome-section">
+            <h1>📝 Ver Asistencia</h1>
+            <p>Docente: {{ nombre_docente }}</p>
+        </div>
+        <div class="user-section">
+            <span class="user-name">👤 {{ nombre_docente }}</span>
+            <a href="{% url 'docente_dashboard' %}" class="logout-btn">Volver al Dashboard</a>
+        </div>
+    </div>
+
+    <!-- Filtros -->
+    <div class="table-card">
+        <h3>🔍 Filtros</h3>
+        
+        <form method="get" class="admin-form">
+            <div class="form-row">
+                <div class="form-group">
+                    <label>📚 Curso</label>
+                    <select name="id_curso">
+                        <option value="">Todos los cursos</option>
+                        {% for curso in cursos %}
+                        <option value="{{ curso.0 }}" {% if selected_curso == curso.0|stringformat:"s" %}selected{% endif %}>{{ curso.1 }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>📅 Fecha</label>
+                    <input type="date" name="fecha" value="{{ selected_fecha }}">
+                </div>
+            </div>
+            <div class="form-actions">
+                <button type="submit" class="btn-submit">🔍 Filtrar</button>
+                <a href="{% url 'docente_ver_asistencia' %}" class="btn-cancel">🔄 Limpiar Filtros</a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Tabla de Asistencia -->
+    <div class="table-card">
+        <h3>📋 Registros de Asistencia</h3>
+        
+        {% if asistencias %}
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Fecha</th>
+                    <th>Alumno</th>
+                    <th>Curso</th>
+                    <th>Estado</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for asistencia in asistencias %}
+                <tr>
+                    <td>{{ asistencia.0|date:"d/m/Y" }}</td>
+                    <td>{{ asistencia.1 }} {{ asistencia.2 }}</td>
+                    <td>{{ asistencia.3 }}</td>
+                    <td>
+                        {% if asistencia.4 == 'P' %}
+                            <span class="badge presente">✅ Presente</span>
+                        {% elif asistencia.4 == 'A' %}
+                            <span class="badge ausente">❌ Ausente</span>
+                        {% else %}
+                            <span class="badge justificado">📋 Justificado</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-state-icon">📋</div>
+            <p>No hay registros de asistencia con los filtros seleccionados</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+</body>
+</html>

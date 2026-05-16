@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Registrar Asistencia</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <link rel="stylesheet" href="{% static 'css/asistencia_form.css' %}">
+</head>
+<body>
+
+<div class="form-container">
+    <h2>📅 Registrar Asistencia</h2>
+
+    <form method="post">
+        {% csrf_token %}
+
+        <div class="form-group">
+            <label>Alumno / Curso</label>
+            <select name="id_inscripcion" required>
+                <option value="">Seleccione alumno y curso</option>
+                {% for i in inscripciones %}
+                <option value="{{ i.id_inscripcion }}">
+                    {{ i.nombre }} {{ i.apellido_paterno }} - {{ i.nombre_curso }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Estado</label>
+            <select name="estado" required>
+                <option value="P">Presente</option>
+                <option value="A">Ausente</option>
+                <option value="J">Justificado</option>
+            </select>
+        </div>
+
+        <button type="submit" class="btn-submit">Guardar Asistencia</button>
+    </form>
+
+    <a href="{% url 'asistencia_list' %}" class="back-link">← Volver a la lista</a>
+</div>
+
+</body>
+</html>
