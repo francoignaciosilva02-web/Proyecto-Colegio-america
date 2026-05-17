@@ -3,10 +3,11 @@
 <head>
     <title>Crear Alumno</title>
     {% load static %}
-    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
-    <link rel="stylesheet" href="{% static 'css/admin_dashboard.css' %}">
-    <link rel="stylesheet" href="{% static 'css/accordion-menu.css' %}">
-    <link rel="stylesheet" href="{% static 'css/forms.css' %}">
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}?v=4.0">
+    <link rel="stylesheet" href="{% static 'css/admin_dashboard.css' %}?v=4.0">
+    <link rel="stylesheet" href="{% static 'css/admin-components.css' %}?v=4.0">
+    <link rel="stylesheet" href="{% static 'css/accordion-menu.css' %}?v=4.0">
+    <link rel="stylesheet" href="{% static 'css/forms.css' %}?v=4.0">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <style>
         .rut-container {
@@ -18,7 +19,7 @@
             flex: 1;
         }
         .dv-separator {
-            color: white;
+            color: #000;
             font-weight: bold;
         }
         .dv-input {
@@ -27,7 +28,7 @@
         }
     </style>
 </head>
-<body style="align-items: flex-start; padding-top: 30px;">
+<body>
 
 <div class="dashboard-container" style="max-width: 1400px; width: 95%;">
 
@@ -56,8 +57,8 @@
                     </div>
                     <div class="accordion-content active">
                         <ul>
-                            <li><a href="{% url 'alumnos_list' %}"><i class="fas fa-user-graduate"></i> Alumnos</a></li>
-                            <li><a href="{% url 'docentes_list' %}"><i class="fas fa-chalkboard-teacher"></i> Docentes</a></li>
+                            <li><a href="{% url 'alumnos_list' %}"><i class="fas fa-user-graduate"></i> Crear Alumnos</a></li>
+                            <li><a href="{% url 'docentes_list' %}"><i class="fas fa-chalkboard-teacher"></i> Crear Docentes</a></li>
                             <li><a href="{% url 'gestion_cursos' %}"><i class="fas fa-book"></i> Gestión de Cursos</a></li>
                             <li><a href="{% url 'inscribir_alumno' %}"><i class="fas fa-user-plus"></i> Inscribir Alumno</a></li>
                             <li><a href="{% url 'admin_asistencia' %}"><i class="fas fa-clipboard-check"></i> Asistencia</a></li>

@@ -5,6 +5,7 @@
     {% load static %}
     <link rel="stylesheet" href="{% static 'css/styles.css' %}?v=4.0">
     <link rel="stylesheet" href="{% static 'css/admin_dashboard.css' %}?v=4.0">
+    <link rel="stylesheet" href="{% static 'css/admin-components.css' %}?v=4.0">
     <link rel="stylesheet" href="{% static 'css/accordion-menu.css' %}?v=4.0">
     <link rel="stylesheet" href="{% static 'css/admin_calificaciones.css' %}?v=4.0">
     <!-- FontAwesome para iconos reales -->
@@ -105,9 +106,6 @@
 
             <div class="data-section">
                 <h3><i class="fas fa-star"></i> Seleccione un Alumno para Ver Calificaciones</h3>
-                <p style="color: rgba(255,255,255,0.8); margin-bottom: 20px;">
-                    Haga clic en "Seleccionar" para ver y gestionar las calificaciones del alumno.
-                </p>
 
                 {% if alumnos %}
                 <table class="data-table">
@@ -150,9 +148,6 @@
             {% if selected_alumno %}
             <div class="data-section" style="margin-top: 30px;">
                 <h3><i class="fas fa-book"></i> Calificaciones del Alumno</h3>
-                <p style="color: rgba(255,255,255,0.8); margin-bottom: 20px;">
-                    Gestione las calificaciones del alumno seleccionado.
-                </p>
 
                 {% if libro %}
                 <table class="data-table">
