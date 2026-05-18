@@ -1,93 +1,213 @@
-/* Estilos para el formulario de alumnos */
-body {
-    min-height: 100vh;
-    align-items: flex-start;
-    padding-top: 30px;
+/* Estilos adicionales para el formulario de alumnos con estructura admin */
+
+/* Estilos específicos del formulario */
+.data-section {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    padding: 30px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    margin-bottom: 20px;
 }
-.form-container {
-    width: 95%;
-    max-width: 800px;
-    margin: 0 auto;
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(10px);
-    border-radius: 15px;
-    padding: 40px;
-    box-shadow: 0 5px 20px rgba(0,0,0,0.2);
-}
-.form-container h2 {
+
+.data-section h3 {
     color: white;
-    margin-bottom: 30px;
-    font-size: 24px;
-    text-align: center;
+    margin-bottom: 25px;
+    font-size: 20px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
-.form-grid {
+
+.data-section h3 i {
+    color: #4CAF50;
+}
+
+/* Formulario admin */
+.admin-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* Filas del formulario */
+.form-row {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 15px;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
 }
+
+.form-row.two-cols {
+    grid-template-columns: repeat(2, 1fr);
+}
+
+.form-row.one-col {
+    grid-template-columns: 1fr;
+}
+
+/* Grupos de formulario */
 .form-group {
     display: flex;
     flex-direction: column;
+    gap: 8px;
 }
-.form-group.full-width {
-    grid-column: span 2;
-}
+
 .form-group label {
-    color: rgba(255,255,255,0.8);
+    color: #000000;
     font-size: 14px;
-    margin-bottom: 5px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 6px;
 }
+
+.form-group label i {
+    color: #4CAF50;
+    font-size: 13px;
+}
+
 .form-group input,
 .form-group select {
-    padding: 12px;
+    padding: 12px 15px;
     border-radius: 8px;
-    border: 1px solid rgba(255,255,255,0.3);
-    background: rgba(255,255,255,0.1);
-    color: white;
+    border: 1px solid #cccccc;
+    background: #ffffff;
+    color: #000000;
     font-size: 14px;
     outline: none;
+    transition: all 0.3s ease;
 }
+
+.form-group input::placeholder {
+    color: #999999;
+}
+
 .form-group input:focus,
 .form-group select:focus {
     border-color: #4CAF50;
-    background: rgba(255,255,255,0.15);
+    background: #ffffff;
+    box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.2);
 }
-.form-group input::placeholder {
-    color: rgba(255,255,255,0.5);
-}
+
 .form-group select option {
-    background: #2a5298;
+    background: #ffffff;
+    color: #000000;
+    padding: 10px;
+}
+
+.form-group select option:checked {
+    background: #4CAF50;
     color: white;
 }
-.btn-group {
+
+/* Acciones del formulario */
+.form-actions {
     display: flex;
     gap: 15px;
-    margin-top: 25px;
+    margin-top: 30px;
     justify-content: center;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
-.btn-submit {
-    padding: 12px 30px;
-    background: rgba(76, 175, 80, 0.5);
-    color: white;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 16px;
-    transition: 0.3s;
-}
-.btn-submit:hover {
-    background: rgba(76, 175, 80, 0.7);
-}
+
+.btn-submit,
 .btn-cancel {
     padding: 12px 30px;
-    background: rgba(255, 255, 255, 0.1);
-    color: white;
-    border: 1px solid rgba(255,255,255,0.3);
     border-radius: 8px;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
     text-decoration: none;
-    font-size: 16px;
-    transition: 0.3s;
+    border: none;
+    white-space: nowrap;
 }
+
+.btn-submit {
+    background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+    color: white;
+    box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+}
+
+.btn-submit:hover {
+    background: linear-gradient(135deg, #45a049 0%, #3d8b40 100%);
+    box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+    transform: translateY(-2px);
+}
+
+.btn-submit:active {
+    transform: translateY(0);
+}
+
+.btn-cancel {
+    background: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
 .btn-cancel:hover {
-    background: rgba(255,255,255,0.2);
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+/* Alertas */
+.alert {
+    padding: 15px 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 14px;
+    animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.alert.success {
+    background: rgba(76, 175, 80, 0.15);
+    color: #a5d6a7;
+    border: 1px solid rgba(76, 175, 80, 0.3);
+}
+
+.alert.error {
+    background: rgba(244, 67, 54, 0.15);
+    color: #ef9a9a;
+    border: 1px solid rgba(244, 67, 54, 0.3);
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+    .form-row {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+    
+    .form-actions {
+        flex-direction: column;
+    }
+    
+    .btn-submit,
+    .btn-cancel {
+        width: 100%;
+        justify-content: center;
+    }
 }

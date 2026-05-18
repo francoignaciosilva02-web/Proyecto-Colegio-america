@@ -1,107 +1,266 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Formulario Alumno</title>
+    <title>Crear Alumno</title>
     {% load static %}
-    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
-    <link rel="stylesheet" href="{% static 'css/alumnos_form.css' %}">
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}?v=4.0">
+    <link rel="stylesheet" href="{% static 'css/admin_dashboard.css' %}?v=4.0">
+    <link rel="stylesheet" href="{% static 'css/accordion-menu.css' %}?v=4.0">
+    <link rel="stylesheet" href="{% static 'css/alumnos_form.css' %}?v=4.0">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
 </head>
 <body>
 
-<div class="form-container">
-    <h2>👨‍🎓 Formulario Alumno</h2>
+<div class="dashboard-container" style="max-width: 1400px; width: 95%;">
 
-    <form method="post">
-        {% csrf_token %}
+    <div class="dashboard-header">
+        <div class="header-title">
+            <span class="admin-badge">ADMIN</span>
+            <h1><i class="fas fa-user-graduate"></i> Crear Alumno</h1>
+        </div>
+        <div class="header-user">
+            <span><i class="fas fa-user-shield"></i> {{ email|default:"Administrador" }}</span>
+        </div>
+    </div>
 
-        <div class="form-grid">
-            <div class="form-group">
-                <label>RUT Número</label>
-                <input type="text" name="rut_numero" placeholder="12345678" value="{{ alumno.rut_numero }}">
-            </div>
-            <div class="form-group">
-                <label>DV</label>
-                <input type="text" name="dv" placeholder="K" maxlength="1" value="{{ alumno.dv }}">
-            </div>
-            <div class="form-group">
-                <label>Nombre</label>
-                <input type="text" name="nombre" placeholder="Nombre" value="{{ alumno.nombre }}">
-            </div>
-            <div class="form-group">
-                <label>Apellido Paterno</label>
-                <input type="text" name="apellido_paterno" placeholder="Apellido Paterno" value="{{ alumno.apellido_paterno }}">
-            </div>
-            <div class="form-group">
-                <label>Apellido Materno</label>
-                <input type="text" name="apellido_materno" placeholder="Apellido Materno" value="{{ alumno.apellido_materno }}">
-            </div>
-            <div class="form-group">
-                <label>Fecha Nacimiento</label>
-                <input type="date" name="fecha_nacimiento" value="{{ alumno.fecha_nacimiento }}">
-            </div>
-            <div class="form-group">
-                <label>Género</label>
-                <select name="genero">
-                    <option value="M" {% if alumno.genero == 'M' %}selected{% endif %}>Masculino</option>
-                    <option value="F" {% if alumno.genero == 'F' %}selected{% endif %}>Femenino</option>
-                    <option value="F" {% if alumno.genero == 'N' %}selected{% endif %}>Prefiero no decirlo</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label>Nacionalidad</label>
-                <select name="nacionalidad" required>
-                    <option value="">Seleccione</option>
-                    <option value="Chilena" {% if alumno.nacionalidad == 'Chilena' %}selected{% endif %}>Chilena</option>
-                    <option value="Argentina" {% if alumno.nacionalidad == 'Argentina' %}selected{% endif %}>Argentina</option>
-                    <option value="Peruana" {% if alumno.nacionalidad == 'Peruana' %}selected{% endif %}>Peruana</option>
-                    <option value="Venezolana" {% if alumno.nacionalidad == 'Venezolana' %}selected{% endif %}>Venezolana</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label>Calle</label>
-                <input type="text" name="calle" placeholder="Calle" value="{{ alumno.calle }}">
-            </div>
-            <div class="form-group">
-                <label>Número</label>
-                <input type="text" name="numero" placeholder="Número" value="{{ alumno.numero }}">
-            </div>
-            <div class="form-group">
-                <label>Región</label>
-                <select name="region" required>
-                    <option value="">Seleccione</option>
-                    <option value="RM" {% if alumno.region == 'RM' %}selected{% endif %}>Región Metropolitana</option>
-                    <option value="V" {% if alumno.region == 'V' %}selected{% endif %}>Región de Valparaíso</option>
-                    <option value="IX" {% if alumno.region == 'IX' %}selected{% endif %}>Región de La Araucanía</option>
-                    <option value="II" {% if alumno.region == 'II' %}selected{% endif %}>Región de Antofagasta</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label>Comuna</label>
-                <select name="comuna" required>
-                    <option value="">Seleccione</option>
-                    <option value="Santiago" {% if alumno.comuna == 'Santiago' %}selected{% endif %}>Santiago</option>
-                    <option value="Valparaíso" {% if alumno.comuna == 'Valparaíso' %}selected{% endif %}>Valparaíso</option>
-                    <option value="Temuco" {% if alumno.comuna == 'Temuco' %}selected{% endif %}>Temuco</option>
-                    <option value="Antofagasta" {% if alumno.comuna == 'Antofagasta' %}selected{% endif %}>Antofagasta</option>
-                </select>
-            </div>
+    <div class="admin-layout">
+        <!-- MENÚ LATERAL ACORDEÓN -->
+        <div class="sidebar">
+            <h3><i class="fas fa-database"></i> Panel de Control</h3>
             
-            <div class="form-group">
-                <label>Correo</label>
-                <input type="email" name="email" placeholder="Correo" value="{{ alumno.email }}">
-            </div>
-            <div class="form-group full-width">
-                <label>Teléfono</label>
-                <input type="text" name="fono" placeholder="Teléfono" value="{{ alumno.fono }}">
+            <ul class="accordion-menu">
+                <li class="accordion-item">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                        <span class="accordion-title">
+                            <i class="fas fa-graduation-cap" style="color: #4CAF50;"></i>
+                            Gestión Académica
+                        </span>
+                        <i class="fas fa-chevron-down accordion-icon"></i>
+                    </div>
+                    <div class="accordion-content">
+                        <ul>
+                            <li><a href="{% url 'alumnos_list' %}"><i class="fas fa-user-graduate"></i> Alumnos</a></li>
+                            <li><a href="{% url 'docentes_list' %}"><i class="fas fa-chalkboard-teacher"></i> Docentes</a></li>
+                            <li><a href="{% url 'gestion_cursos' %}"><i class="fas fa-book"></i> Gestión de Cursos</a></li>
+                            <li><a href="{% url 'admin_calificaciones' %}"><i class="fas fa-star"></i> Calificaciones</a></li>
+                            <li><a href="{% url 'admin_asistencia' %}"><i class="fas fa-clipboard-check"></i> Asistencia</a></li>
+                            <li><a href="{% url 'inscribir_alumno' %}"><i class="fas fa-user-plus"></i> Inscribir Alumno</a></li>
+                        </ul>
+                    </div>
+                </li>
+                
+                <li class="accordion-item">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                        <span class="accordion-title">
+                            <i class="fas fa-users" style="color: #2196F3;"></i>
+                            Gestión Familiar
+                        </span>
+                        <i class="fas fa-chevron-down accordion-icon"></i>
+                    </div>
+                    <div class="accordion-content">
+                        <ul>
+                            <li><a href="{% url 'crear_apoderado' %}"><i class="fas fa-user-tie"></i> Apoderados</a></li>
+                            <li><a href="{% url 'asignar_apoderado' %}"><i class="fas fa-link"></i> Asignaciones</a></li>
+                        </ul>
+                    </div>
+                </li>
+                
+                <li class="accordion-item">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                        <span class="accordion-title">
+                            <i class="fas fa-heartbeat" style="color: #FF9800;"></i>
+                            Complementario
+                        </span>
+                        <i class="fas fa-chevron-down accordion-icon"></i>
+                    </div>
+                    <div class="accordion-content">
+                        <ul>
+                            <li><a href="{% url 'datos_medicos' %}"><i class="fas fa-hospital"></i> Datos Médicos</a></li>
+                            <li><a href="{% url 'datos_academicos' %}"><i class="fas fa-chart-bar"></i> Datos Académicos</a></li>
+                        </ul>
+                    </div>
+                </li>
+                
+                <li class="accordion-item">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                        <span class="accordion-title">
+                            <i class="fas fa-shield-alt" style="color: #9C27B0;"></i>
+                            Sistema
+                        </span>
+                        <i class="fas fa-chevron-down accordion-icon"></i>
+                    </div>
+                    <div class="accordion-content">
+                        <ul>
+                            <li><a href="{% url 'auditoria' %}"><i class="fas fa-search"></i> Auditoría</a></li>
+                            <li><a href="{% url 'toma_datos' %}"><i class="fas fa-download"></i> Toma de Datos</a></li>
+                        </ul>
+                    </div>
+                </li>
+            </ul>
+            
+            <div class="logout-menu-item">
+                <a href="{% url 'logout' %}"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a>
             </div>
         </div>
 
-        <div class="btn-group">
-            <button type="submit" class="btn-submit">💾 Guardar</button>
-            <a href="{% url 'alumnos_list' %}" class="btn-cancel">❌ Cancelar</a>
+        <!-- CONTENIDO PRINCIPAL -->
+        <div class="main-content">
+            
+            <div class="data-section">
+                <h3><i class="fas fa-user-graduate"></i> Nuevo Alumno</h3>
+                
+                {% if mensaje %}
+                <div class="alert success"><i class="fas fa-check-circle"></i> {{ mensaje }}</div>
+                {% endif %}
+
+                {% if error %}
+                <div class="alert error"><i class="fas fa-times-circle"></i> {{ error }}</div>
+                {% endif %}
+
+                <form method="post" class="admin-form">
+                    {% csrf_token %}
+
+                    <!-- SECCIÓN 1: RUT -->
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label><i class="fas fa-id-card"></i> RUT Número</label>
+                            <input type="text" name="rut_numero" maxlength="8" placeholder="12345678" value="{{ alumno.rut_numero }}" required>
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-barcode"></i> DV</label>
+                            <input type="text" name="dv" maxlength="1" placeholder="K" value="{{ alumno.dv }}" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-user"></i> Nombre</label>
+                            <input type="text" name="nombre" placeholder="Nombre" value="{{ alumno.nombre }}" required>
+                        </div>
+                    </div>
+
+                    <!-- SECCIÓN 2: APELLIDOS -->
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label><i class="fas fa-user"></i> Apellido Paterno</label>
+                            <input type="text" name="apellido_paterno" placeholder="Apellido Paterno" value="{{ alumno.apellido_paterno }}" required>
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-user"></i> Apellido Materno</label>
+                            <input type="text" name="apellido_materno" placeholder="Apellido Materno" value="{{ alumno.apellido_materno }}" required>
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-calendar"></i> Fecha Nacimiento</label>
+                            <input type="date" name="fecha_nacimiento" value="{{ alumno.fecha_nacimiento }}" required>
+                        </div>
+                    </div>
+
+                    <!-- SECCIÓN 3: GÉNERO Y NACIONALIDAD -->
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label><i class="fas fa-venus-mars"></i> Género</label>
+                            <select name="genero" required>
+                                <option value="">Seleccione</option>
+                                <option value="M" {% if alumno.genero == 'M' %}selected{% endif %}>Masculino</option>
+                                <option value="F" {% if alumno.genero == 'F' %}selected{% endif %}>Femenino</option>
+                                <option value="N" {% if alumno.genero == 'N' %}selected{% endif %}>Prefiero no decirlo</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-flag"></i> Nacionalidad</label>
+                            <select name="nacionalidad" required>
+                                <option value="">Seleccione</option>
+                                <option value="Chilena" {% if alumno.nacionalidad == 'Chilena' %}selected{% endif %}>Chilena</option>
+                                <option value="Argentina" {% if alumno.nacionalidad == 'Argentina' %}selected{% endif %}>Argentina</option>
+                                <option value="Peruana" {% if alumno.nacionalidad == 'Peruana' %}selected{% endif %}>Peruana</option>
+                                <option value="Venezolana" {% if alumno.nacionalidad == 'Venezolana' %}selected{% endif %}>Venezolana</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- SECCIÓN 4: DIRECCIÓN -->
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label><i class="fas fa-road"></i> Calle</label>
+                            <input type="text" name="calle" placeholder="Calle" value="{{ alumno.calle }}" required>
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-home"></i> Número</label>
+                            <input type="text" name="numero" placeholder="Número" value="{{ alumno.numero }}" required>
+                        </div>
+                    </div>
+
+                    <!-- SECCIÓN 5: REGIÓN Y COMUNA -->
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label><i class="fas fa-map"></i> Región</label>
+                            <select name="region" required>
+                                <option value="">Seleccione</option>
+                                <option value="RM" {% if alumno.region == 'RM' %}selected{% endif %}>Región Metropolitana</option>
+                                <option value="V" {% if alumno.region == 'V' %}selected{% endif %}>Región de Valparaíso</option>
+                                <option value="IX" {% if alumno.region == 'IX' %}selected{% endif %}>Región de La Araucanía</option>
+                                <option value="II" {% if alumno.region == 'II' %}selected{% endif %}>Región de Antofagasta</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-city"></i> Comuna</label>
+                            <select name="comuna" required>
+                                <option value="">Seleccione</option>
+                                <option value="Santiago" {% if alumno.comuna == 'Santiago' %}selected{% endif %}>Santiago</option>
+                                <option value="Valparaíso" {% if alumno.comuna == 'Valparaíso' %}selected{% endif %}>Valparaíso</option>
+                                <option value="Temuco" {% if alumno.comuna == 'Temuco' %}selected{% endif %}>Temuco</option>
+                                <option value="Antofagasta" {% if alumno.comuna == 'Antofagasta' %}selected{% endif %}>Antofagasta</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- SECCIÓN 6: CONTACTO -->
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label><i class="fas fa-envelope"></i> Correo</label>
+                            <input type="email" name="email" placeholder="Correo" value="{{ alumno.email }}" required>
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-phone"></i> Teléfono</label>
+                            <input type="text" name="fono" placeholder="Teléfono" value="{{ alumno.fono }}" required>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn-submit">
+                            <i class="fas fa-save"></i> Guardar Alumno
+                        </button>
+                        <a href="{% url 'alumnos_list' %}" class="btn-cancel">
+                            <i class="fas fa-arrow-left"></i> Volver al Dashboard
+                        </a>
+                    </div>
+                </form>
+            </div>
+
         </div>
-    </form>
+    </div>
+
 </div>
+
+<script>
+    function toggleAccordion(header) {
+        document.querySelectorAll('.accordion-header').forEach(h => {
+            if (h !== header && h.classList.contains('active')) {
+                h.classList.remove('active');
+                h.nextElementSibling.classList.remove('active');
+            }
+        });
+        header.classList.toggle('active');
+        header.nextElementSibling.classList.toggle('active');
+    }
+    
+    // Abrir acordeón de Gestión Académica por defecto
+    document.addEventListener('DOMContentLoaded', function() {
+        const firstAccordion = document.querySelector('.accordion-header');
+        if (firstAccordion) {
+            firstAccordion.classList.add('active');
+            firstAccordion.nextElementSibling.classList.add('active');
+        }
+    });
+</script>
 
 </body>
 </html>

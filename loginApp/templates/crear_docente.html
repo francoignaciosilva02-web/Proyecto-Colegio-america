@@ -1,61 +1,54 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <title>Crear Docente</title>
-        {% load static %}
-        <link rel="stylesheet" href="{% static 'css/styles.css' %}?v=4.0">
-        <link rel="stylesheet" href="{% static 'css/admin_dashboard.css' %}?v=4.0">
-        <link rel="stylesheet" href="{% static 'css/admin-components.css' %}?v=4.0">
-        <link rel="stylesheet" href="{% static 'css/accordion-menu.css' %}?v=4.0">
-        <link rel="stylesheet" href="{% static 'css/forms.css' %}?v=4.0">
-        <!-- FontAwesome para iconos reales -->
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-        <style>
-            .rut-container {
-                display: flex;
-                align-items: center;
-                gap: 8px;
-            }
-            .rut-container input {
-                flex: 1;
-            }
-            .dv-separator {
-                color: #000;
-                font-weight: bold;
-            }
-            .dv-input {
-                width: 50px !important;
-                text-align: center;
-            }
-        </style>
-    </head>
-    <body>
+    <title>Crear Docente</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}?v=4.0">
+    <link rel="stylesheet" href="{% static 'css/admin_dashboard.css' %}?v=4.0">
+    <link rel="stylesheet" href="{% static 'css/accordion-menu.css' %}?v=4.0">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+</head>
+<body>
+
+<div class="dashboard-container" style="max-width: 1400px; width: 95%;">
+
+    <div class="dashboard-header">
+        <div class="header-title">
+            <span class="admin-badge">ADMIN</span>
+            <h1><i class="fas fa-chalkboard-teacher"></i> Crear Docente</h1>
+        </div>
+        <div class="header-user">
+            <span><i class="fas fa-user-shield"></i> {{ email|default:"Administrador" }}</span>
+        </div>
+    </div>
+
+    <div class="admin-layout">
+        <!-- MENÚ LATERAL ACORDEÓN -->
+        <div class="sidebar">
             <h3><i class="fas fa-database"></i> Panel de Control</h3>
             
             <ul class="accordion-menu">
                 <li class="accordion-item">
-                    <div class="accordion-header active" onclick="toggleAccordion(this)">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">
                         <span class="accordion-title">
                             <i class="fas fa-graduation-cap" style="color: #4CAF50;"></i>
                             Gestión Académica
                         </span>
                         <i class="fas fa-chevron-down accordion-icon"></i>
                     </div>
-                    <div class="accordion-content active">
+                    <div class="accordion-content">
                         <ul>
                             <li><a href="{% url 'alumnos_list' %}"><i class="fas fa-user-graduate"></i> Alumnos</a></li>
-                            <li><a href="{% url 'docentes_list' %}" class="active"><i class="fas fa-chalkboard-teacher"></i> Docentes</a></li>
+                            <li><a href="{% url 'docentes_list' %}"><i class="fas fa-chalkboard-teacher"></i> Docentes</a></li>
                             <li><a href="{% url 'gestion_cursos' %}"><i class="fas fa-book"></i> Gestión de Cursos</a></li>
+                            <li><a href="{% url 'admin_calificaciones' %}"><i class="fas fa-star"></i> Calificaciones</a></li>
+                            <li><a href="{% url 'admin_asistencia' %}"><i class="fas fa-clipboard-check"></i> Asistencia</a></li>
                             <li><a href="{% url 'inscribir_alumno' %}"><i class="fas fa-user-plus"></i> Inscribir Alumno</a></li>
-                                <li><a href="{% url 'alumnos_list' %}"><i class="fas fa-user-graduate"></i> Alumnos</a></li>
-                                <li><a href="{% url 'docentes_list' %}" class="active"><i class="fas fa-chalkboard-teacher"></i> Docentes</a></li>
-                                <li><a href="{% url 'gestion_cursos' %}"><i class="fas fa-book"></i> Gestión de Cursos</a></li>
-                                <li><a href="{% url 'admin_calificaciones' %}"><i class="fas fa-star"></i> Calificaciones</a></li>
-                                <li><a href="{% url 'admin_asistencia' %}"><i class="fas fa-clipboard-check"></i> Asistencia</a></li>
-                                <li><a href="{% url 'inscribir_alumno' %}"><i class="fas fa-user-plus"></i> Inscribir Alumno</a></li>
+                        </ul>
+                    </div>
+                </li>
+                
                 <li class="accordion-item">
                     <div class="accordion-header" onclick="toggleAccordion(this)">
                         <span class="accordion-title">
@@ -110,20 +103,19 @@
             </div>
         </div>
 
+        <!-- CONTENIDO PRINCIPAL -->
         <div class="main-content">
-            <div class="dashboard-container">
-                <div class="dashboard-header">
-                    <div class="header-title">
-                        <span class="admin-badge">ADMIN</span>
-                        <h1><i class="fas fa-chalkboard-teacher"></i> Crear Docente</h1>
-                    </div>
-                    <div class="header-user">
-                        <span><i class="fas fa-user-shield"></i> {{ email|default:"Administrador" }}</span>
-                    </div>
-                </div>
-
+            
             <div class="data-section">
                 <h3><i class="fas fa-chalkboard-teacher"></i> Nuevo Docente</h3>
+                
+                {% if mensaje %}
+                <div class="alert success"><i class="fas fa-check-circle"></i> {{ mensaje }}</div>
+                {% endif %}
+
+                {% if error %}
+                <div class="alert error"><i class="fas fa-times-circle"></i> {{ error }}</div>
+                {% endif %}
 
                 <form method="post" class="admin-form">
                     {% csrf_token %}
@@ -138,35 +130,41 @@
                             </div>
                             <input type="hidden" name="rut" id="rut_completo">
                         </div>
+
                         <div class="form-group">
                             <label><i class="fas fa-user"></i> Nombre</label>
-                            <input type="text" name="nombre" placeholder="Nombre" value="{{ docente.nombre }}">
-                        </div>
-                        <div class="form-group">
-                            <label><i class="fas fa-user"></i> Apellido Paterno</label>
-                            <input type="text" name="paterno" placeholder="Apellido Paterno" value="{{ docente.paterno }}">
+                            <input type="text" name="nombre" placeholder="Nombre" value="{{ docente.nombre }}" required>
                         </div>
                     </div>
 
                     <div class="form-row">
                         <div class="form-group">
-                            <label><i class="fas fa-user"></i> Apellido Materno</label>
-                            <input type="text" name="materno" placeholder="Apellido Materno" value="{{ docente.materno }}">
+                            <label><i class="fas fa-user"></i> Apellido Paterno</label>
+                            <input type="text" name="paterno" placeholder="Apellido Paterno" value="{{ docente.paterno }}" required>
                         </div>
+
+                        <div class="form-group">
+                            <label><i class="fas fa-user"></i> Apellido Materno</label>
+                            <input type="text" name="materno" placeholder="Apellido Materno" value="{{ docente.materno }}" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
                         <div class="form-group">
                             <label><i class="fas fa-envelope"></i> Correo</label>
-                            <input type="email" name="email" placeholder="Correo" value="{{ docente.email }}">
+                            <input type="email" name="email" placeholder="Correo Electrónico" value="{{ docente.email }}" required>
                         </div>
+
                         <div class="form-group">
                             <label><i class="fas fa-user-circle"></i> Usuario</label>
-                            <input type="text" name="usuario" placeholder="Usuario" value="{{ docente.usuario }}">
+                            <input type="text" name="usuario" placeholder="Usuario" value="{{ docente.usuario }}" required>
                         </div>
                     </div>
 
                     <div class="form-row">
                         <div class="form-group">
                             <label><i class="fas fa-lock"></i> Contraseña</label>
-                            <input type="password" name="password" placeholder="Contraseña">
+                            <input type="password" name="password" placeholder="Contraseña" required>
                         </div>
                     </div>
 
@@ -175,17 +173,91 @@
                             <i class="fas fa-save"></i> Guardar Docente
                         </button>
                         <a href="{% url 'docentes_list' %}" class="btn-cancel">
-                            <i class="fas fa-arrow-left"></i> Volver al Dashboard
+                            <i class="fas fa-arrow-left"></i> Volver
                         </a>
                     </div>
                 </form>
             </div>
-                </div>
 
         </div>
     </div>
 
 </div>
+
+<script>
+    function toggleAccordion(header) {
+        document.querySelectorAll('.accordion-header').forEach(h => {
+            if (h !== header && h.classList.contains('active')) {
+                h.classList.remove('active');
+                h.nextElementSibling.classList.remove('active');
+            }
+        });
+        header.classList.toggle('active');
+        header.nextElementSibling.classList.toggle('active');
+    }
+    
+    function calcularDV(rut) {
+        let suma = 0;
+        let multiplo = 2;
+        for (let i = rut.length - 1; i >= 0; i--) {
+            suma += parseInt(rut[i]) * multiplo;
+            multiplo = multiplo === 7 ? 2 : multiplo + 1;
+        }
+        let resto = suma % 11;
+        let dv = 11 - resto;
+        if (dv === 11) return '0';
+        if (dv === 10) return 'K';
+        return dv.toString();
+    }
+
+    const rutInput = document.getElementById('rut_numero');
+    const dvInput = document.getElementById('dv');
+    const rutCompleto = document.getElementById('rut_completo');
+
+    rutInput.addEventListener('input', function(e) {
+        this.value = this.value.replace(/[^0-9]/g, '');
+        if (this.value.length > 0) {
+            dvInput.value = calcularDV(this.value);
+        } else {
+            dvInput.value = '';
+        }
+        rutCompleto.value = this.value + dvInput.value;
+    });
+
+    document.querySelector('form').addEventListener('submit', function() {
+        rutCompleto.value = rutInput.value + dvInput.value;
+    });
+</script>
+
+<style>
+    .rut-container {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .rut-container input {
+        flex: 1;
+    }
+    
+    .rut-container input:first-child {
+        width: 70%;
+    }
+    
+    .dv-separator {
+        color: #666;
+        font-weight: bold;
+        font-size: 18px;
+    }
+    
+    .dv-input {
+        width: 50px !important;
+        text-align: center;
+    }
+</style>
+
+</body>
+</html>
 
 <script>
 function toggleAccordion(header) {
