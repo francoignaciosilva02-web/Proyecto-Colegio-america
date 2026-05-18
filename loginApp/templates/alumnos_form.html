@@ -108,7 +108,7 @@
         <div class="main-content">
             
             <div class="data-section">
-                <h3><i class="fas fa-user-graduate"></i> Nuevo Alumno</h3>
+                <h3 style="color: black;"><i class="fas fa-user-graduate"></i> Nuevo Alumno</h3>
                 
                 {% if mensaje %}
                 <div class="alert success"><i class="fas fa-check-circle"></i> {{ mensaje }}</div>
@@ -121,15 +121,14 @@
                 <form method="post" class="admin-form">
                     {% csrf_token %}
 
-                    <!-- SECCIÓN 1: RUT -->
                     <div class="form-row">
                         <div class="form-group">
                             <label><i class="fas fa-id-card"></i> RUT Número</label>
-                            <input type="text" name="rut_numero" maxlength="8" placeholder="12345678" value="{{ alumno.rut_numero }}" required>
+                            <input type="text" id="rut_numero" name="rut_numero" maxlength="8" placeholder="12345678" value="{{ alumno.rut_numero }}" required>
                         </div>
                         <div class="form-group">
                             <label><i class="fas fa-barcode"></i> DV</label>
-                            <input type="text" name="dv" maxlength="1" placeholder="K" value="{{ alumno.dv }}" readonly>
+                            <input type="text" id="dv" name="dv" maxlength="1" placeholder="K" value="{{ alumno.dv }}" readonly class="dv-input">
                         </div>
                         <div class="form-group">
                             <label><i class="fas fa-user"></i> Nombre</label>
@@ -137,7 +136,6 @@
                         </div>
                     </div>
 
-                    <!-- SECCIÓN 2: APELLIDOS -->
                     <div class="form-row">
                         <div class="form-group">
                             <label><i class="fas fa-user"></i> Apellido Paterno</label>
@@ -153,8 +151,7 @@
                         </div>
                     </div>
 
-                    <!-- SECCIÓN 3: GÉNERO Y NACIONALIDAD -->
-                    <div class="form-row">
+                    <div class="form-row two-cols">
                         <div class="form-group">
                             <label><i class="fas fa-venus-mars"></i> Género</label>
                             <select name="genero" required>
@@ -176,8 +173,7 @@
                         </div>
                     </div>
 
-                    <!-- SECCIÓN 4: DIRECCIÓN -->
-                    <div class="form-row">
+                    <div class="form-row two-cols">
                         <div class="form-group">
                             <label><i class="fas fa-road"></i> Calle</label>
                             <input type="text" name="calle" placeholder="Calle" value="{{ alumno.calle }}" required>
@@ -188,8 +184,7 @@
                         </div>
                     </div>
 
-                    <!-- SECCIÓN 5: REGIÓN Y COMUNA -->
-                    <div class="form-row">
+                    <div class="form-row two-cols">
                         <div class="form-group">
                             <label><i class="fas fa-map"></i> Región</label>
                             <select name="region" required>
@@ -212,8 +207,7 @@
                         </div>
                     </div>
 
-                    <!-- SECCIÓN 6: CONTACTO -->
-                    <div class="form-row">
+                    <div class="form-row two-cols">
                         <div class="form-group">
                             <label><i class="fas fa-envelope"></i> Correo</label>
                             <input type="email" name="email" placeholder="Correo" value="{{ alumno.email }}" required>
@@ -251,6 +245,32 @@
         header.classList.toggle('active');
         header.nextElementSibling.classList.toggle('active');
     }
+    
+    function calcularDV(rut) {
+        let suma = 0;
+        let multiplo = 2;
+        for (let i = rut.length - 1; i >= 0; i--) {
+            suma += parseInt(rut[i]) * multiplo;
+            multiplo = multiplo === 7 ? 2 : multiplo + 1;
+        }
+        let resto = suma % 11;
+        let dv = 11 - resto;
+        if (dv === 11) return '0';
+        if (dv === 10) return 'K';
+        return dv.toString();
+    }
+
+    const rutInput = document.getElementById('rut_numero');
+    const dvInput = document.getElementById('dv');
+
+    rutInput.addEventListener('input', function(e) {
+        this.value = this.value.replace(/[^0-9]/g, '');
+        if (this.value.length > 0) {
+            dvInput.value = calcularDV(this.value);
+        } else {
+            dvInput.value = '';
+        }
+    });
     
     // Abrir acordeón de Gestión Académica por defecto
     document.addEventListener('DOMContentLoaded', function() {

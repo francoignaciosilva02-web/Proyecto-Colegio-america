@@ -189,6 +189,17 @@
     border: 1px solid rgba(244, 67, 54, 0.3);
 }
 
+/* Estilos para el DV input */
+.dv-input {
+    width: 60px !important;
+    text-align: center !important;
+}
+
+/* Dos columnas */
+.form-row.two-cols {
+    grid-template-columns: repeat(2, 1fr);
+}
+
 /* Responsive */
 @media (max-width: 1200px) {
     .form-row {
@@ -197,7 +208,8 @@
 }
 
 @media (max-width: 768px) {
-    .form-row {
+    .form-row,
+    .form-row.two-cols {
         grid-template-columns: 1fr;
     }
     
