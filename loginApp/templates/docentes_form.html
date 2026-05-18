@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Crear Docente</title>
+    <title>Formulario Docente</title>
     {% load static %}
     <link rel="stylesheet" href="{% static 'css/styles.css' %}?v=4.0">
     <link rel="stylesheet" href="{% static 'css/admin_dashboard.css' %}?v=4.0">
@@ -16,7 +16,7 @@
     <div class="dashboard-header">
         <div class="header-title">
             <span class="admin-badge">ADMIN</span>
-            <h1><i class="fas fa-chalkboard-teacher"></i> Crear Docente</h1>
+            <h1><i class="fas fa-chalkboard-teacher"></i> Docente</h1>
         </div>
         <div class="header-user">
             <span><i class="fas fa-user-shield"></i> {{ email|default:"Administrador" }}</span>
@@ -255,54 +255,6 @@
         text-align: center;
     }
 </style>
-
-</body>
-</html>
-
-<script>
-function toggleAccordion(header) {
-    document.querySelectorAll('.accordion-header').forEach(h => {
-        if (h !== header && h.classList.contains('active')) {
-            h.classList.remove('active');
-            h.nextElementSibling.classList.remove('active');
-        }
-    });
-    header.classList.toggle('active');
-    header.nextElementSibling.classList.toggle('active');
-}
-
-function calcularDV(rut) {
-    let suma = 0;
-    let multiplo = 2;
-    for (let i = rut.length - 1; i >= 0; i--) {
-        suma += parseInt(rut[i]) * multiplo;
-        multiplo = multiplo === 7 ? 2 : multiplo + 1;
-    }
-    let resto = suma % 11;
-    let dv = 11 - resto;
-    if (dv === 11) return '0';
-    if (dv === 10) return 'K';
-    return dv.toString();
-}
-
-const rutInput = document.getElementById('rut_numero');
-const dvInput = document.getElementById('dv');
-const rutCompleto = document.getElementById('rut_completo');
-
-rutInput.addEventListener('input', function(e) {
-    this.value = this.value.replace(/[^0-9]/g, '');
-    if (this.value.length > 0) {
-        dvInput.value = calcularDV(this.value);
-    } else {
-        dvInput.value = '';
-    }
-    rutCompleto.value = this.value + dvInput.value;
-});
-
-document.querySelector('form').addEventListener('submit', function() {
-    rutCompleto.value = rutInput.value + dvInput.value;
-});
-</script>
 
 </body>
 </html>

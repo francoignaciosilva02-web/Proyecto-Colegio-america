@@ -86,7 +86,7 @@ def login_view(request):
             request.session['id_usuario'] = id_usuario
             request.session['rol'] = rol
 
-            """
+            
             # COMENTADO: Envío de código verificador por email
             # Descomentar estas líneas para activar verificación 2FA
 
@@ -113,7 +113,7 @@ def login_view(request):
             )
 
             return redirect('token')
-            """
+            
 
             # BYPASS: Login directo sin verificación de código
             request.session['autenticado'] = True
@@ -416,7 +416,7 @@ def docentes_create(request):
         conn.commit()
         return redirect('docentes_list')
 
-    return render(request, 'crear_docente.html')
+    return render(request, 'docentes_form.html')
 
 
 # 🔹 EDITAR DOCENTE
@@ -2021,24 +2021,24 @@ def crear_alumno_view(request):
 
             # Validación: RUT número no vacío y solo dígitos
             if not rut_numero:
-                return render(request, 'crear_alumno.html', {
+                return render(request, 'alumnos_form.html', {
                     'error': 'El campo RUT número es obligatorio'
                 })
 
             if not rut_numero.isdigit():
-                return render(request, 'crear_alumno.html', {
+                return render(request, 'alumnos_form.html', {
                     'error': 'El RUT solo puede contener números'
                 })
 
             # Validación: RUT no puede superar 8 dígitos
             if len(rut_numero) > 8:
-                return render(request, 'crear_alumno.html', {
+                return render(request, 'alumnos_form.html', {
                     'error': 'El RUT no puede superar 8 dígitos'
                 })
 
             # Validación: DV no vacío
             if not dv:
-                return render(request, 'crear_alumno.html', {
+                return render(request, 'alumnos_form.html', {
                     'error': 'El dígito verificador (DV) es obligatorio'
                 })
 
@@ -2048,7 +2048,7 @@ def crear_alumno_view(request):
 
             if not validator.validar(rut_completo):
                 dv_esperado = validator.calcular_dv(rut_numero)
-                return render(request, 'crear_alumno.html', {
+                return render(request, 'alumnos_form.html', {
                     'error': f'El dígito verificador es incorrecto. DV esperado: {dv_esperado}, DV ingresado: {dv}'
                 })
 
@@ -2081,12 +2081,12 @@ def crear_alumno_view(request):
 
             conn.commit()
 
-            return render(request, 'crear_alumno.html', {
+            return render(request, 'alumnos_form.html', {
                 'mensaje': 'Alumno guardado correctamente'
             })
 
         except Exception as e:
-            return render(request, 'crear_alumno.html', {
+            return render(request, 'alumnos_form.html', {
                 'error': str(e)
             })
 

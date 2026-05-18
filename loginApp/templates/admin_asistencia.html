@@ -93,13 +93,13 @@
 
     <div class="main-content">
         <div class="dashboard-container">
-            <div class="dashboard-header">
+            <div class="dashboard-header asistencia-header">
                 <div class="header-title">
                     <span class="admin-badge">ADMIN</span>
                     <h1><i class="fas fa-clipboard-check"></i> Control de Asistencia</h1>
-                </div>
-                <div class="header-user">
-                    <span><i class="fas fa-user-shield"></i> {{ email|default:"Administrador" }}</span>
+                    <div class="header-user centered-user">
+                        <span><i class="fas fa-user-shield"></i> {{ email|default:"Administrador" }}</span>
+                    </div>
                 </div>
             </div>
 
@@ -185,30 +185,27 @@
                     {% csrf_token %}
                     <input type="hidden" name="fecha" value="{{ fecha }}">
 
-                    <table class="data-table">
-                        <thead>
-                            <tr>
-                                <th>N°</th>
-                                <th>Alumno</th>
-                                <th>Estado</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for alumno in alumnos %}
-                            <tr>
-                                <td>{{ forloop.counter }}</td>
-                                <td>{{ alumno.1 }} {{ alumno.2 }} {{ alumno.3 }}</td>
-                                <td>
+                    <div class="asistencia-grid">
+                        {% for alumno in alumnos %}
+                        <div class="asistencia-card">
+                            <div class="card-header">
+                                <span class="numero-alumno">{{ forloop.counter }}</span>
+                                <h4>{{ alumno.1 }}</h4>
+                            </div>
+                            <div class="card-body">
+                                <p class="apellidos">{{ alumno.2 }} {{ alumno.3 }}</p>
+                                <div class="estado-wrapper">
+                                    <label>Estado:</label>
                                     <select name="estado_{{ alumno.0 }}" class="estado-select">
                                         <option value="P">🟢 Presente</option>
                                         <option value="A">🔴 Ausente</option>
                                         <option value="T">🟡 Tarde</option>
                                     </select>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
 
                     <div class="form-actions">
                         <button type="submit" class="btn-submit">
