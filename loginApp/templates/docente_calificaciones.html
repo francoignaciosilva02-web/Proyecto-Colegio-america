@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Calificaciones - Docente</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}?v=4.0">
+    <link rel="stylesheet" href="{% static 'css/docente_dashboard.css' %}?v=4.0">
+    <link rel="stylesheet" href="{% static 'css/admin_calificaciones.css' %}?v=4.0">
+    <!-- FontAwesome para iconos reales -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+</head>
+<body>
+
+<div class="dashboard-container">
+    <!-- Header -->
+    <div class="dashboard-header">
+        <div class="welcome-section">
+            <h1>⭐ Calificaciones</h1>
+            <p>Gestión de Notas - {{ nombre_docente }}</p>
+        </div>
+        <div class="user-section">
+            <span class="user-name">👤 {{ nombre_docente }}</span>
+            <a href="{% url 'docente_dashboard' %}" class="logout-btn">Volver al Dashboard</a>
+        </div>
+    </div>
+
+    <div class="data-section">
+        <h3><i class="fas fa-user-graduate"></i> Seleccione un Alumno para Ver Calificaciones</h3>
+
+        {% if alumnos %}
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Apellido Paterno</th>
+                    <th>Apellido Materno</th>
+                    <th>Acción</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for alumno in alumnos %}
+                <tr {% if selected_alumno and selected_alumno == alumno.0 %}style="background: rgba(76, 175, 80, 0.2);"{% endif %}>
+                    <td>{{ alumno.0 }}</td>
+                    <td>{{ alumno.1 }}</td>
+                    <td>{{ alumno.2 }}</td>
+                    <td>{{ alumno.3 }}</td>
+                    <td>
+                        <form method="get" style="display: inline;">
+                            <input type="hidden" name="id_alumno" value="{{ alumno.0 }}">
+                            <button type="submit" class="btn-ver-calificaciones">
+                                <i class="fas fa-eye"></i> Seleccionar
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-state-icon"><i class="fas fa-user-graduate"></i></div>
+            <p>No hay alumnos inscritos en sus cursos</p>
+        </div>
+        {% endif %}
+    </div>
+
+    {% if selected_alumno %}
+    <div class="data-section" style="margin-top: 30px;">
+        <h3><i class="fas fa-book"></i> Calificaciones del Alumno</h3>
+
+        {% if libro %}
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Materia</th>
+                    <th>Notas</th>
+                    <th>Promedio</th>
+                    <th>Acción</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for materia, datos in libro.items %}
+                <tr>
+                    <td>{{ materia }}</td>
+                    <td>
+                        {% for nota in datos.notas %}
+                            <span class="nota">{{ nota.nota }}</span>
+                        {% endfor %}
+                    </td>
+                    <td class="promedio">{{ datos.promedio }}</td>
+                    <td>
+                        <button class="btn-agregar" onclick="mostrarFormularioAgregar('{{ materia }}')">
+                            <i class="fas fa-plus"></i> Agregar
+                        </button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-state-icon"><i class="fas fa-book"></i></div>
+            <p>No hay calificaciones registradas para este alumno</p>
+            <button class="btn-agregar" onclick="mostrarFormularioAgregar('')">
+                <i class="fas fa-plus"></i> Agregar Primera Calificación
+            </button>
+        </div>
+        {% endif %}
+
+        <!-- Formulario para agregar calificación -->
+        <div id="formulario-agregar" class="data-section" style="display: none;">
+            <h3><i class="fas fa-plus-circle"></i> Agregar Calificación</h3>
+            <form method="post" class="admin-form">
+                {% csrf_token %}
+                <input type="hidden" name="id_alumno" value="{{ selected_alumno }}">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Materia</label>
+                        <select name="materia" id="materia-input" required>
+                            <option value="">Seleccione materia</option>
+                            {% for materia in materias %}
+                            <option value="{{ materia.0 }}">{{ materia.1 }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Nota</label>
+                        <input type="number" name="nota" step="0.1" min="1.0" max="7.0" required>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn-submit">
+                        <i class="fas fa-save"></i> Guardar Calificación
+                    </button>
+                    <button type="button" class="btn-cancel" onclick="ocultarFormulario()">
+                        <i class="fas fa-times"></i> Cancelar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    {% endif %}
+
+</div>
+
+<script>
+    function mostrarFormularioAgregar(materia) {
+        document.getElementById('formulario-agregar').style.display = 'block';
+        // Buscar y seleccionar la materia en el select
+        const select = document.getElementById('materia-input');
+        for (let i = 0; i < select.options.length; i++) {
+            if (select.options[i].text === materia) {
+                select.selectedIndex = i;
+                break;
+            }
+        }
+    }
+
+    function ocultarFormulario() {
+        document.getElementById('formulario-agregar').style.display = 'none';
+        document.getElementById('materia-input').selectedIndex = 0;
+    }
+</script>
+
+</body>
+</html>

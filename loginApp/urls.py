@@ -69,6 +69,7 @@ urlpatterns = [
     path('docente/ver-alumnos/', docente_ver_alumnos_view, name='docente_ver_alumnos'),
     path('docente/ver-cursos/', docente_ver_cursos_view, name='docente_ver_cursos'),
     path('docente/ver-asistencia/', docente_ver_asistencia_view, name='docente_ver_asistencia'),
+    path('docente/ver-calificaciones/', docente_ver_calificaciones_view, name='docente_ver_calificaciones'),
 
     # LIBRO DE NOTAS
     path('libro-notas/<int:id_alumno>/', libro_notas_view, name='libro_notas'),

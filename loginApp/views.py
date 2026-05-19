@@ -86,34 +86,29 @@ def login_view(request):
             request.session['id_usuario'] = id_usuario
             request.session['rol'] = rol
 
-            
             # COMENTADO: Envío de código verificador por email
             # Descomentar estas líneas para activar verificación 2FA
-
-            cursor.execute('''
-                INSERT INTO tokens_sesion (id_usuario, token, fecha_expiracion, usado, activo)
-                VALUES (?, ?, DATEADD(MINUTE, 5, GETDATE()), 0, 1)
-            ''', (id_usuario, token))
-            conn.commit()
-
-            # Renderizar template HTML para el correo (CSS en archivo externo)
-            from django.template.loader import render_to_string
-            html_message = render_to_string('email_verificacion.html', {
-                'nombre_usuario': nombre_usuario,
-                'token': token
-            })
-
-            send_mail(
-                'Código de verificación',
-                f'Tu código es: {token}',
-                settings.EMAIL_HOST_USER,
-                ['franco.silvaah@correoaiep.cl'],
-                fail_silently=False,
-                html_message=html_message
-            )
-
-            return redirect('token')
-            
+            # token = str(random.randint(100000, 999999))
+            # nombre_usuario = user_check[2] if user_check[2] else email.split('@')[0]
+            # cursor.execute('''
+            #     INSERT INTO tokens_sesion (id_usuario, token, fecha_expiracion, usado, activo)
+            #     VALUES (?, ?, DATEADD(MINUTE, 5, GETDATE()), 0, 1)
+            # ''', (id_usuario, token))
+            # conn.commit()
+            # from django.template.loader import render_to_string
+            # html_message = render_to_string('email_verificacion.html', {
+            #     'nombre_usuario': nombre_usuario,
+            #     'token': token
+            # })
+            # send_mail(
+            #     'Código de verificación',
+            #     f'Tu código es: {token}',
+            #     settings.EMAIL_HOST_USER,
+            #     ['franco.silvaah@correoaiep.cl'],
+            #     fail_silently=False,
+            #     html_message=html_message
+            # )
+            # return redirect('token')
 
             # BYPASS: Login directo sin verificación de código
             request.session['autenticado'] = True
@@ -401,16 +396,14 @@ def docentes_create(request):
         cursor = conn.cursor()
 
         cursor.execute("""
-            INSERT INTO docente (rut, nombre, paterno, materno, email, usuario, password)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO docente (rut, nombre, paterno, materno, email)
+            VALUES (?, ?, ?, ?, ?)
         """, (
             request.POST['rut'],
             request.POST['nombre'],
             request.POST['paterno'],
             request.POST['materno'],
             request.POST['email'],
-            request.POST['usuario'],
-            request.POST['password'],
         ))
 
         conn.commit()
@@ -431,7 +424,7 @@ def docentes_edit(request, id):
         cursor.execute("""
             UPDATE docente SET
                 rut=?, nombre=?, paterno=?, materno=?,
-                email=?, usuario=?, password=?
+                email=?
             WHERE id_docente=?
         """, (
             request.POST['rut'],
@@ -439,8 +432,6 @@ def docentes_edit(request, id):
             request.POST['paterno'],
             request.POST['materno'],
             request.POST['email'],
-            request.POST['usuario'],
-            request.POST['password'],
             id
         ))
 
@@ -2336,6 +2327,161 @@ def docente_ver_asistencia_view(request):
         'asistencias': asistencias,
         'selected_curso': id_curso,
         'selected_fecha': fecha
+    })
+
+def docente_ver_calificaciones_view(request):
+    if not request.session.get('autenticado'):
+        return redirect('login')
+
+    rol = request.session.get('rol', '').lower()
+    if rol != 'docente':
+        return redirect('login')
+
+    id_usuario = request.session.get('id_usuario')
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    # Obtener docente
+    cursor.execute("""
+        SELECT d.id_docente, d.nombre
+        FROM docente d
+        JOIN usuarios u ON u.correo = d.email
+        WHERE u.id_usuario = ?
+    """, (id_usuario,))
+    docente = cursor.fetchone()
+
+    if not docente:
+        return redirect('login')
+
+    id_docente = docente[0]
+    nombre_docente = docente[1]
+
+    # Obtener alumnos de los cursos del docente
+    cursor.execute("""
+        SELECT DISTINCT a.id_alumno, a.nombre, a.apellido_paterno, a.apellido_materno
+        FROM alumnos a
+        JOIN inscripcion i ON a.id_alumno = i.id_alumno
+        JOIN curso c ON i.id_curso = c.id_curso
+        WHERE c.id_docente = ?
+        ORDER BY a.apellido_paterno, a.nombre
+    """, (id_docente,))
+    alumnos = cursor.fetchall()
+
+    # Obtener todas las materias
+    cursor.execute("""
+        SELECT id_materia, nombre
+        FROM materias
+        ORDER BY nombre
+    """)
+    materias = cursor.fetchall()
+
+    selected_alumno = None
+    libro = {}
+
+    # Manejar selección de alumno
+    if request.method == 'GET' and 'id_alumno' in request.GET:
+        selected_alumno = request.GET.get('id_alumno')
+
+        # Obtener notas del alumno
+        cursor.execute(
+            "EXEC sp_libro_notas ?",
+            [selected_alumno]
+        )
+        resultados = cursor.fetchall()
+
+        # Obtener promedios
+        cursor.execute(
+            "EXEC sp_promedio_alumno ?",
+            [selected_alumno]
+        )
+        promedios_raw = cursor.fetchall()
+
+        # Crear diccionario de promedios
+        promedios_dict = {}
+        for row in promedios_raw:
+            promedios_dict[row[0]] = row[1]
+
+        # Agrupar notas por materia con promedio incluido
+        for row in resultados:
+            materia = row[0]
+            id_nota = row[1]
+            nota = row[2]
+            fecha = row[3]
+
+            if materia not in libro:
+                libro[materia] = {
+                    'notas': [],
+                    'promedio': promedios_dict.get(materia, 0)
+                }
+
+            libro[materia]['notas'].append({
+                'id_nota': id_nota,
+                'nota': nota,
+                'fecha': fecha
+            })
+
+    # Manejar agregado de calificación
+    if request.method == 'POST':
+        id_materia = request.POST.get('materia')
+        nota = request.POST.get('nota')
+        selected_alumno = request.POST.get('id_alumno')
+
+        if id_materia and nota and selected_alumno:
+            # Insertar nueva calificación
+            cursor.execute("""
+                INSERT INTO notas (id_alumno, id_materia, nota, fecha)
+                VALUES (?, ?, ?, GETDATE())
+            """, (selected_alumno, id_materia, nota))
+            conn.commit()
+
+            # Recargar notas del alumno
+            cursor.execute(
+                "EXEC sp_libro_notas ?",
+                [selected_alumno]
+            )
+            resultados = cursor.fetchall()
+
+            # Recargar promedios
+            cursor.execute(
+                "EXEC sp_promedio_alumno ?",
+                [selected_alumno]
+            )
+            promedios_raw = cursor.fetchall()
+
+            # Crear diccionario de promedios
+            promedios_dict = {}
+            for row in promedios_raw:
+                promedios_dict[row[0]] = row[1]
+
+            # Agrupar notas por materia con promedio incluido
+            libro = {}
+            for row in resultados:
+                materia_row = row[0]
+                id_nota = row[1]
+                nota_row = row[2]
+                fecha = row[3]
+
+                if materia_row not in libro:
+                    libro[materia_row] = {
+                        'notas': [],
+                        'promedio': promedios_dict.get(materia_row, 0)
+                    }
+
+                libro[materia_row]['notas'].append({
+                    'id_nota': id_nota,
+                    'nota': nota_row,
+                    'fecha': fecha
+                })
+
+    conn.close()
+
+    return render(request, 'docente_calificaciones.html', {
+        'nombre_docente': nombre_docente,
+        'alumnos': alumnos,
+        'selected_alumno': selected_alumno,
+        'libro': libro,
+        'materias': materias
     })
 
 def gestion_cursos_view(request):
