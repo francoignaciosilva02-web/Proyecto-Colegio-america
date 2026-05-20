@@ -1969,25 +1969,41 @@ def auditoria_view(request):
     conn = get_connection()
     cursor = conn.cursor()
 
-    # 🔹 Obtener logs de auditoría desde la tabla de logs o intentos_login
+    # 🔹 Obtener logs de auditoría
     try:
-        # Intentar usar la tabla logs (nueva estructura con SP)
+        # Nueva tabla: logs_actividad
         cursor.execute("""
-            SELECT TOP 50 l.fecha, u.correo, l.accion, l.ip
-            FROM logs l
-            LEFT JOIN usuarios u ON l.id_usuario = u.id_usuario
+            SELECT TOP 50 
+                l.fecha,
+                u.correo,
+                l.accion,
+                l.ip
+            FROM logs_actividad l
+            LEFT JOIN usuarios u 
+                ON l.id_usuario = u.id_usuario
             ORDER BY l.fecha DESC
         """)
+        
         logs = cursor.fetchall()
-    except:
-        # Fallback a intentos_login (estructura antigua)
+
+    except Exception as e:
+        print("Error auditoría:", e)
+
+        # Fallback a intentos_login
         cursor.execute("""
-            SELECT TOP 50 fecha_intento, correo, 
-                CASE WHEN exito = 1 THEN 'Inicio sesión exitoso' ELSE 'Intento fallido' END,
+            SELECT TOP 50 
+                fecha_intento,
+                correo,
+                CASE 
+                    WHEN exito = 1 
+                    THEN 'Inicio sesión exitoso'
+                    ELSE 'Intento fallido'
+                END,
                 ip
             FROM intentos_login
             ORDER BY fecha_intento DESC
         """)
+        
         logs = cursor.fetchall()
 
     return render(request, 'auditoria.html', {
