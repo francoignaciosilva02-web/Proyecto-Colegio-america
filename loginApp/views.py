@@ -941,21 +941,21 @@ def datos_medicos_view(request):
 
         if request.method == 'POST':
             id_alumno = request.POST['id_alumno']
-            grupo_sangre = request.POST['grupo_sangre']
+            grupo_sanguineo = request.POST.get('grupo_sanguineo', '')
             alergias = request.POST['alergias']
             enfermedades = request.POST['enfermedades']
 
             cursor.execute("""
                 INSERT INTO datos_medicos (
                     id_alumno,
-                    grupo_sangre,
+                    grupo_sanguineo,
                     alergias,
                     enfermedades
                 )
                 VALUES (?, ?, ?, ?)
             """, (
                 id_alumno,
-                grupo_sangre,
+                grupo_sanguineo,
                 alergias,
                 enfermedades
             ))
