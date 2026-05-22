@@ -35,6 +35,7 @@ urlpatterns = [
     path('cursos/crear/', cursos_create, name='cursos_create'),
     path('cursos/editar/<int:id>/', cursos_edit, name='cursos_edit'),
     path('cursos/eliminar/<int:id>/', cursos_delete, name='cursos_delete'),
+    path('cursos/detalle/<int:id_curso>/', curso_detalle_view, name='curso_detalle'),
     path('gestion-cursos/', gestion_cursos_view, name='gestion_cursos'),
 
     # INSCRIPCIONES

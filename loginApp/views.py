@@ -410,8 +410,7 @@ def docentes_create(request):
         return redirect('docentes_list')
 
     return render(request, 'docentes_form.html')
-
-
+    
 # 🔹 EDITAR DOCENTE
 def docentes_edit(request, id):
     if not request.session.get('autenticado'):
@@ -2137,52 +2136,87 @@ def docente_pasar_asistencia_view(request):
     """, (id_docente,))
     cursos = cursor.fetchall()
 
+    alumnos = []
+    id_curso_seleccionado = None
+    fecha_seleccionada = None
+
     if request.method == 'POST':
-        id_curso = request.POST.get('id_curso')
-        fecha = request.POST.get('fecha')
+        accion = request.POST.get('accion')
 
-        # Obtener alumnos inscritos en el curso
-        cursor.execute("""
-            SELECT i.id_inscripcion, a.nombre, a.apellido_paterno
-            FROM inscripcion i
-            JOIN alumnos a ON i.id_alumno = a.id_alumno
-            WHERE i.id_curso = ?
-        """, (id_curso,))
-        alumnos = cursor.fetchall()
+        if accion == 'cargar_alumnos':
+            # Cargar alumnos del curso seleccionado
+            id_curso_seleccionado = request.POST.get('id_curso')
+            fecha_seleccionada = request.POST.get('fecha')
 
-        # Procesar asistencia
-        for alumno in alumnos:
-            id_inscripcion = alumno[0]
-            estado = request.POST.get(f'estado_{id_inscripcion}', 'A')
+            if id_curso_seleccionado and fecha_seleccionada:
+                # Obtener alumnos inscritos en el curso
+                cursor.execute("""
+                    SELECT i.id_inscripcion, a.nombre, a.apellido_paterno, a.apellido_materno
+                    FROM inscripcion i
+                    JOIN alumnos a ON i.id_alumno = a.id_alumno
+                    WHERE i.id_curso = ?
+                    ORDER BY a.apellido_paterno, a.nombre
+                """, (id_curso_seleccionado,))
+                alumnos = cursor.fetchall()
 
-            # Verificar si ya existe asistencia para esa fecha
+        elif accion == 'registrar_asistencia':
+            # Registrar asistencia
+            id_curso_seleccionado = request.POST.get('id_curso')
+            fecha_seleccionada = request.POST.get('fecha')
+
+            # Obtener alumnos inscritos en el curso
             cursor.execute("""
-                SELECT id_asistencia FROM asistencia
-                WHERE id_inscripcion = ? AND CAST(fecha AS DATE) = ?
-            """, (id_inscripcion, fecha))
+                SELECT i.id_inscripcion, a.nombre, a.apellido_paterno
+                FROM inscripcion i
+                JOIN alumnos a ON i.id_alumno = a.id_alumno
+                WHERE i.id_curso = ?
+            """, (id_curso_seleccionado,))
+            alumnos = cursor.fetchall()
 
-            existing = cursor.fetchone()
+            # Procesar asistencia
+            for alumno in alumnos:
+                id_inscripcion = alumno[0]
+                estado = request.POST.get(f'estado_{id_inscripcion}', 'A')
 
-            if existing:
-                # Actualizar
+                # Verificar si ya existe asistencia para esa fecha
                 cursor.execute("""
-                    UPDATE asistencia SET estado = ?
+                    SELECT id_asistencia FROM asistencia
                     WHERE id_inscripcion = ? AND CAST(fecha AS DATE) = ?
-                """, (estado, id_inscripcion, fecha))
-            else:
-                # Insertar
-                cursor.execute("""
-                    INSERT INTO asistencia (id_inscripcion, fecha, estado)
-                    VALUES (?, ?, ?)
-                """, (id_inscripcion, fecha, estado))
+                """, (id_inscripcion, fecha_seleccionada))
 
-        conn.commit()
-        return redirect('docente_pasar_asistencia')
+                existing = cursor.fetchone()
+
+                if existing:
+                    # Actualizar
+                    cursor.execute("""
+                        UPDATE asistencia SET estado = ?
+                        WHERE id_inscripcion = ? AND CAST(fecha AS DATE) = ?
+                    """, (estado, id_inscripcion, fecha_seleccionada))
+                else:
+                    # Insertar
+                    cursor.execute("""
+                        INSERT INTO asistencia (id_inscripcion, fecha, estado)
+                        VALUES (?, ?, ?)
+                    """, (id_inscripcion, fecha_seleccionada, estado))
+
+            conn.commit()
+            return render(request, 'docente_pasar_asistencia.html', {
+                'nombre_docente': nombre_docente,
+                'cursos': cursos,
+                'alumnos': alumnos,
+                'id_curso_seleccionado': id_curso_seleccionado,
+                'fecha_seleccionada': fecha_seleccionada,
+                'fecha_hoy': datetime.now().strftime('%Y-%m-%d'),
+                'mensaje': 'Asistencia registrada correctamente'
+            })
 
     # GET request - mostrar formulario
     return render(request, 'docente_pasar_asistencia.html', {
         'nombre_docente': nombre_docente,
         'cursos': cursos,
+        'alumnos': alumnos,
+        'id_curso_seleccionado': id_curso_seleccionado,
+        'fecha_seleccionada': fecha_seleccionada,
         'fecha_hoy': datetime.now().strftime('%Y-%m-%d')
     })
 
@@ -2526,4 +2560,46 @@ def gestion_cursos_view(request):
 
     return render(request, 'gestion_cursos.html', {
         'cursos': cursos
+    })
+
+
+def curso_detalle_view(request, id_curso):
+    if not request.session.get('autenticado'):
+        return redirect('login')
+
+    rol = request.session.get('rol', '').lower()
+    if rol != 'admin':
+        return redirect('login')
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    # Obtener información del curso
+    cursor.execute("""
+        SELECT c.id_curso, c.nombre_curso, c.año_academico, d.nombre as nombre_docente,
+               d.email as email_docente, d.paterno as paterno_docente, d.materno as materno_docente
+        FROM curso c
+        LEFT JOIN docente d ON c.id_docente = d.id_docente
+        WHERE c.id_curso = ?
+    """, (id_curso,))
+    curso = cursor.fetchone()
+
+    if not curso:
+        return redirect('gestion_cursos')
+
+    # Obtener alumnos inscritos en el curso
+    cursor.execute("""
+        SELECT a.id_alumno, a.nombre, a.apellido_paterno, a.apellido_materno, a.email
+        FROM alumnos a
+        JOIN inscripcion i ON a.id_alumno = i.id_alumno
+        WHERE i.id_curso = ?
+        ORDER BY a.apellido_paterno, a.nombre
+    """, (id_curso,))
+    alumnos = cursor.fetchall()
+
+    conn.close()
+
+    return render(request, 'curso_detalle.html', {
+        'curso': curso,
+        'alumnos': alumnos
     })

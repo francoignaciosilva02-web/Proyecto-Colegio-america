@@ -1,12 +1,11 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Gestión de Cursos</title>
+    <title>Detalle del Curso</title>
     {% load static %}
     <link rel="stylesheet" href="{% static 'css/styles.css' %}?v=4.0">
     <link rel="stylesheet" href="{% static 'css/admin_dashboard.css' %}?v=4.0">
     <link rel="stylesheet" href="{% static 'css/accordion-menu.css' %}?v=4.0">
-    <!-- FontAwesome para iconos reales -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
 </head>
 <body>
@@ -16,7 +15,7 @@
     <div class="dashboard-header">
         <div class="header-title">
             <span class="admin-badge">ADMIN</span>
-            <h1><i class="fas fa-book"></i> Gestión de Cursos</h1>
+            <h1><i class="fas fa-book"></i> Detalle del Curso</h1>
         </div>
         <div class="header-user">
             <span><i class="fas fa-user-shield"></i> {{ email|default:"Administrador" }}</span>
@@ -24,12 +23,11 @@
     </div>
 
     <div class="admin-layout">
-        <!-- 🔹 MENÚ LATERAL ACORDEÓN -->
+        <!-- MENÚ LATERAL ACORDEÓN -->
         <div class="sidebar">
             <h3><i class="fas fa-database"></i> Panel de Control</h3>
             
             <ul class="accordion-menu">
-                <!-- 📚 GESTIÓN ACADÉMICA -->
                 <li class="accordion-item">
                     <div class="accordion-header active" onclick="toggleAccordion(this)">
                         <span class="accordion-title">
@@ -50,7 +48,6 @@
                     </div>
                 </li>
                 
-                <!-- 👨‍👩‍👦 GESTIÓN FAMILIAR -->
                 <li class="accordion-item">
                     <div class="accordion-header" onclick="toggleAccordion(this)">
                         <span class="accordion-title">
@@ -67,7 +64,6 @@
                     </div>
                 </li>
                 
-                <!-- 🏥 COMPLEMENTARIO -->
                 <li class="accordion-item">
                     <div class="accordion-header" onclick="toggleAccordion(this)">
                         <span class="accordion-title">
@@ -84,7 +80,6 @@
                     </div>
                 </li>
                 
-                <!-- 🛡️ SISTEMA -->
                 <li class="accordion-item">
                     <div class="accordion-header" onclick="toggleAccordion(this)">
                         <span class="accordion-title">
@@ -102,58 +97,67 @@
                 </li>
             </ul>
             
-            <!-- Logout -->
             <div class="logout-menu-item">
                 <a href="{% url 'logout' %}"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a>
             </div>
         </div>
 
-        <!-- 🔹 CONTENIDO PRINCIPAL -->
+        <!-- CONTENIDO PRINCIPAL -->
         <div class="main-content">
             
             <div class="data-section">
-                <h3 style="color: #000;"><i class="fas fa-book"></i> Cursos del Colegio (1° Básico - 8° Básico)</h3>
-                <p style="color: #000; margin-bottom: 20px;">
-                    Listado de todos los cursos del colegio ordenados por nivel educativo.
-                </p>
-                
-                {% if cursos %}
-                <div class="cursos-grid">
-                    {% for curso in cursos %}
-                    <div class="curso-card">
-                        <div class="curso-header">
-                            <div class="curso-icon">
-                                <i class="fas fa-book-reader"></i>
-                            </div>
-                            <div class="curso-info">
-                                <h4>{{ curso.1 }}</h4>
-                                <p class="curso-year">{{ curso.2 }}</p>
-                            </div>
-                        </div>
-                        <div class="curso-details">
-                            <div class="curso-stat">
-                                <i class="fas fa-users"></i>
-                                <span>{{ curso.3 }} alumnos</span>
-                            </div>
-                            <div class="curso-stat">
-                                <i class="fas fa-chalkboard-teacher"></i>
-                                <span>{{ curso.4|default:"Sin asignar" }}</span>
-                            </div>
-                        </div>
-                        <div class="curso-actions">
-                            <a href="{% url 'curso_detalle' curso.0 %}" class="btn-ver">
-                                <i class="fas fa-eye"></i> Ver Detalle
-                            </a>
-                        </div>
+                <div style="margin-bottom: 20px;">
+                    <a href="{% url 'gestion_cursos' %}" class="btn-cancel" style="display: inline-flex; align-items: center; gap: 8px;">
+                        <i class="fas fa-arrow-left"></i> Volver a Cursos
+                    </a>
+                </div>
+
+                <h3 style="color: #000;"><i class="fas fa-book"></i> {{ curso.1 }}</h3>
+                <p style="color: #000; margin-bottom: 30px;">Año Académico: {{ curso.2 }}</p>
+
+                <!-- Información del Docente -->
+                <div class="info-card" style="margin-bottom: 30px;">
+                    <h4 style="color: #000; margin-bottom: 15px;"><i class="fas fa-chalkboard-teacher"></i> Docente Asignado</h4>
+                    {% if curso.3 %}
+                    <div style="color: #000;">
+                        <p><strong>Nombre:</strong> {{ curso.3 }} {{ curso.5|default:"" }} {{ curso.6|default:"" }}</p>
+                        <p><strong>Email:</strong> {{ curso.4|default:"No registrado" }}</p>
                     </div>
-                    {% endfor %}
+                    {% else %}
+                    <p style="color: #666;">Sin docente asignado</p>
+                    {% endif %}
                 </div>
-                {% else %}
-                <div class="empty-state">
-                    <div class="empty-state-icon"><i class="fas fa-book"></i></div>
-                    <p>No hay cursos registrados en el sistema</p>
+
+                <!-- Lista de Alumnos -->
+                <div class="info-card">
+                    <h4 style="color: #000; margin-bottom: 15px;"><i class="fas fa-users"></i> Alumnos Inscritos ({{ alumnos|length }})</h4>
+                    
+                    {% if alumnos %}
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <thead>
+                            <tr style="background: rgba(76, 175, 80, 0.1);">
+                                <th style="padding: 12px; text-align: left; color: #000; border-bottom: 2px solid #4CAF50;">Nombre</th>
+                                <th style="padding: 12px; text-align: left; color: #000; border-bottom: 2px solid #4CAF50;">Apellido Paterno</th>
+                                <th style="padding: 12px; text-align: left; color: #000; border-bottom: 2px solid #4CAF50;">Apellido Materno</th>
+                                <th style="padding: 12px; text-align: left; color: #000; border-bottom: 2px solid #4CAF50;">Email</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for alumno in alumnos %}
+                            <tr style="border-bottom: 1px solid rgba(0,0,0,0.1);">
+                                <td style="padding: 12px; color: #000;">{{ alumno.1 }}</td>
+                                <td style="padding: 12px; color: #000;">{{ alumno.2 }}</td>
+                                <td style="padding: 12px; color: #000;">{{ alumno.3 }}</td>
+                                <td style="padding: 12px; color: #000;">{{ alumno.4|default:"No registrado" }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    {% else %}
+                    <p style="color: #666;">No hay alumnos inscritos en este curso</p>
+                    {% endif %}
                 </div>
-                {% endif %}
+
             </div>
 
         </div>
@@ -162,126 +166,33 @@
 </div>
 
 <style>
-    
-.cursos-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 20px;
-}
+    .info-card {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border-radius: 15px;
+        padding: 20px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+    }
 
-.curso-card {
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(10px);
-    border-radius: 15px;
-    padding: 20px;
-    box-shadow: 0 5px 20px rgba(0,0,0,0.2);
-    transition: transform 0.3s, box-shadow 0.3s;
-}
+    table {
+        background: white;
+        border-radius: 10px;
+        overflow: hidden;
+    }
 
-.curso-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 30px rgba(0,0,0,0.3);
-}
-
-.curso-header {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    margin-bottom: 15px;
-    padding-bottom: 15px;
-    border-bottom: 1px solid rgba(255,255,255,0.2);
-}
-
-.curso-icon {
-    width: 50px;
-    height: 50px;
-    background: linear-gradient(135deg, #4CAF50, #45a049);
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 24px;
-    color: white;
-}
-
-.curso-info h4 {
-    color: #000;
-    margin: 0;
-    font-size: 18px;
-    font-weight: 600;
-}
-
-.curso-year {
-    color: #000;
-    margin: 5px 0 0 0;
-    font-size: 14px;
-}
-
-.curso-details {
-    display: flex;
-    gap: 15px;
-    margin-bottom: 15px;
-}
-
-.curso-stat {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    color: #000;
-    font-size: 14px;
-}
-
-.curso-stat i {
-    color: #4CAF50;
-}
-
-.curso-actions {
-    display: flex;
-    justify-content: flex-end;
-}
-
-.btn-ver {
-    background: linear-gradient(135deg, #4CAF50, #45a049);
-    color: white;
-    padding: 8px 20px;
-    border-radius: 8px;
-    text-decoration: none;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 14px;
-    transition: transform 0.3s, box-shadow 0.3s;
-}
-
-.btn-ver:hover {
-    transform: scale(1.05);
-    box-shadow: 0 4px 15px rgba(76, 175, 80, 0.4);
-}
-
-.empty-state {
-    text-align: center;
-    padding: 40px;
-    color: rgba(255,255,255,0.6);
-}
-
-.empty-state-icon {
-    font-size: 60px;
-    margin-bottom: 20px;
-    opacity: 0.5;
-}
+    table tbody tr:hover {
+        background: rgba(76, 175, 80, 0.05);
+    }
 </style>
 
 <script>
     function toggleAccordion(header) {
-        // Cerrar todos los demás
         document.querySelectorAll('.accordion-header').forEach(h => {
             if (h !== header && h.classList.contains('active')) {
                 h.classList.remove('active');
                 h.nextElementSibling.classList.remove('active');
             }
         });
-        
-        // Toggle el actual
         header.classList.toggle('active');
         header.nextElementSibling.classList.toggle('active');
     }

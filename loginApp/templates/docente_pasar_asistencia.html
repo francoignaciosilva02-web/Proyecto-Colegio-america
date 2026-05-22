@@ -24,6 +24,12 @@
     <div class="table-card">
         <h3>📅 Registrar Asistencia</h3>
         
+        {% if mensaje %}
+        <div style="background: #4CAF50; color: white; padding: 10px; border-radius: 5px; margin-bottom: 20px;">
+            {{ mensaje }}
+        </div>
+        {% endif %}
+        
         <form method="post" class="admin-form">
             {% csrf_token %}
             
@@ -33,23 +39,67 @@
                     <select name="id_curso" id="id_curso" required>
                         <option value="">Seleccione un curso</option>
                         {% for curso in cursos %}
-                        <option value="{{ curso.0 }}">{{ curso.1 }}</option>
+                        <option value="{{ curso.0 }}" {% if id_curso_seleccionado == curso.0|stringformat:"s" %}selected{% endif %}>{{ curso.1 }}</option>
                         {% endfor %}
                     </select>
                 </div>
                 <div class="form-group">
                     <label>📅 Fecha</label>
-                    <input type="date" name="fecha" id="fecha" value="{{ fecha_hoy }}" required>
+                    <input type="date" name="fecha" id="fecha" value="{{ fecha_seleccionada|default:fecha_hoy }}" required>
                 </div>
             </div>
 
-            <div class="form-actions">
-                <button type="submit" class="btn-submit">💾 Cargar Alumnos y Registrar Asistencia</button>
+            {% if alumnos %}
+            <div style="margin: 20px 0;">
+                <h4 style="color: #000; margin-bottom: 15px;">👥 Lista de Alumnos ({{ alumnos|length }})</h4>
+                <table style="width: 100%; border-collapse: collapse; background: white; border-radius: 10px; overflow: hidden;">
+                    <thead>
+                        <tr style="background: rgba(76, 175, 80, 0.1);">
+                            <th style="padding: 12px; text-align: left; color: #000; border-bottom: 2px solid #4CAF50;">Nombre</th>
+                            <th style="padding: 12px; text-align: left; color: #000; border-bottom: 2px solid #4CAF50;">Apellido Paterno</th>
+                            <th style="padding: 12px; text-align: left; color: #000; border-bottom: 2px solid #4CAF50;">Apellido Materno</th>
+                            <th style="padding: 12px; text-align: center; color: #000; border-bottom: 2px solid #4CAF50;">Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for alumno in alumnos %}
+                        <tr style="border-bottom: 1px solid rgba(0,0,0,0.1);">
+                            <td style="padding: 12px; color: #000;">{{ alumno.1 }}</td>
+                            <td style="padding: 12px; color: #000;">{{ alumno.2 }}</td>
+                            <td style="padding: 12px; color: #000;">{{ alumno.3 }}</td>
+                            <td style="padding: 12px; text-align: center;">
+                                <div style="display: flex; justify-content: center; gap: 10px;">
+                                    <label style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
+                                        <input type="radio" name="estado_{{ alumno.0 }}" value="P" checked>
+                                        <span style="color: #4CAF50; font-weight: bold;">Presente</span>
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
+                                        <input type="radio" name="estado_{{ alumno.0 }}" value="A">
+                                        <span style="color: #f44336; font-weight: bold;">Ausente</span>
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
+                                        <input type="radio" name="estado_{{ alumno.0 }}" value="J">
+                                        <span style="color: #FF9800; font-weight: bold;">Justificado</span>
+                                    </label>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
+
+            <div class="form-actions">
+                <button type="submit" name="accion" value="registrar_asistencia" class="btn-submit">💾 Registrar Asistencia</button>
+            </div>
+            {% else %}
+            <div class="form-actions">
+                <button type="submit" name="accion" value="cargar_alumnos" class="btn-submit">📋 Cargar Alumnos</button>
+            </div>
+            {% endif %}
         </form>
     </div>
 </div>
-
 
 </body>
 </html>
