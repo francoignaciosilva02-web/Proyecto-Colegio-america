@@ -1,75 +1,188 @@
-/* Estilos para el formulario de asistencia */
-body {
+/* =========================
+   FORMULARIO ASISTENCIA
+========================= */
+
+body{
+    margin: 0;
+    padding: 0;
+
     min-height: 100vh;
-    align-items: flex-start;
-    padding-top: 30px;
+
+    background: linear-gradient(135deg, #6a8fd8, #2d3e70);
 }
-.form-container {
+
+/* CONTENEDOR */
+
+.form-container{
     width: 95%;
-    max-width: 600px;
-    margin: 0 auto;
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(10px);
-    border-radius: 15px;
-    padding: 40px;
-    box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+    max-width: 1100px;
+
+    margin: 40px auto;
+
+    background: rgba(255,255,255,0.10);
+    backdrop-filter: blur(12px);
+
+    border-radius: 20px;
+
+    padding: 45px;
+
+    box-shadow: 0 8px 30px rgba(0,0,0,0.25);
 }
-.form-container h2 {
+
+/* TITULO */
+
+.form-container h2{
     color: white;
-    margin-bottom: 30px;
-    font-size: 24px;
+
+    font-size: 32px;
+
+    margin-bottom: 35px;
+
     text-align: center;
 }
-.form-group {
-    margin-bottom: 20px;
+
+/* GRID */
+
+form{
+    display: grid;
+
+    grid-template-columns: 1fr 1fr;
+
+    gap: 25px;
 }
-.form-group label {
-    color: rgba(255,255,255,0.8);
-    font-size: 14px;
-    margin-bottom: 8px;
-    display: block;
+
+/* CAMPOS */
+
+.form-group{
+    display: flex;
+    flex-direction: column;
 }
-.form-group select {
+
+.form-group label{
+    color: rgba(255,255,255,0.85);
+
+    font-size: 15px;
+
+    margin-bottom: 10px;
+
+    font-weight: 500;
+}
+
+/* SELECT */
+
+.form-group select{
     width: 100%;
-    padding: 12px;
-    border-radius: 8px;
-    border: 1px solid rgba(255,255,255,0.3);
-    background: rgba(255,255,255,0.1);
+
+    padding: 14px 16px;
+
+    border-radius: 12px;
+
+    border: 1px solid rgba(255,255,255,0.25);
+
+    background: rgba(255,255,255,0.08);
+
     color: white;
-    font-size: 14px;
+
+    font-size: 15px;
+
     outline: none;
-    cursor: pointer;
-}
-.form-group select:focus {
-    border-color: #4CAF50;
-    background: rgba(255,255,255,0.15);
-}
-.form-group select option {
-    background: #2a5298;
-    color: white;
-}
-.btn-submit {
-    padding: 12px 30px;
-    background: rgba(76, 175, 80, 0.5);
-    color: white;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 16px;
+
     transition: 0.3s;
-    width: 100%;
-    margin-top: 10px;
 }
-.btn-submit:hover {
-    background: rgba(76, 175, 80, 0.7);
-}
-.back-link {
-    display: block;
-    text-align: center;
-    margin-top: 20px;
-    color: rgba(255,255,255,0.7);
-    text-decoration: none;
-}
-.back-link:hover {
+
+/* OPCIONES */
+
+.form-group select option{
+    background: #1e3c72;
     color: white;
+}
+
+/* FOCUS */
+
+.form-group select:focus{
+    border-color: #4CAF50;
+
+    background: rgba(255,255,255,0.15);
+
+    box-shadow: 0 0 10px rgba(76,175,80,0.3);
+}
+
+/* BOTON */
+
+.btn-submit{
+    grid-column: span 2;
+
+    width: 100%;
+
+    margin-top: 15px;
+
+    padding: 16px;
+
+    border: none;
+
+    border-radius: 12px;
+
+    background: linear-gradient(135deg, #4CAF50, #45a049);
+
+    color: white;
+
+    font-size: 17px;
+
+    font-weight: bold;
+
+    cursor: pointer;
+
+    transition: 0.3s;
+}
+
+/* HOVER */
+
+.btn-submit:hover{
+    transform: translateY(-2px);
+
+    box-shadow: 0 6px 20px rgba(76,175,80,0.35);
+}
+
+/* VOLVER */
+
+.back-link{
+    grid-column: span 2;
+
+    display: block;
+
+    margin-top: 10px;
+
+    text-align: center;
+
+    text-decoration: none;
+
+    color: rgba(255,255,255,0.75);
+
+    transition: 0.3s;
+}
+
+.back-link:hover{
+    color: white;
+}
+
+/* RESPONSIVE */
+
+@media(max-width: 768px){
+
+    form{
+        grid-template-columns: 1fr;
+    }
+
+    .btn-submit,
+    .back-link{
+        grid-column: span 1;
+    }
+
+    .form-container{
+        padding: 25px;
+    }
+
+    .form-container h2{
+        font-size: 24px;
+    }
 }

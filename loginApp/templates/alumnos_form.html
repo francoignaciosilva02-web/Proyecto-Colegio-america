@@ -119,70 +119,269 @@
                 {% endif %}
 
                 <form method="post" class="admin-form">
-                    {% csrf_token %}
 
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label><i class="fas fa-id-card"></i> RUT Número</label>
-                            <input type="text" id="rut_numero" name="rut_numero" maxlength="8" placeholder="12345678" value="{{ alumno.rut_numero }}" required>
-                        </div>
-                        <div class="form-group">
-                            <label><i class="fas fa-barcode"></i> DV</label>
-                            <input type="text" id="dv" name="dv" maxlength="1" placeholder="K" value="{{ alumno.dv }}" readonly class="dv-input">
-                        </div>
-                        <div class="form-group">
-                            <label><i class="fas fa-user"></i> Nombre</label>
-                            <input type="text" name="nombre" placeholder="Nombre" value="{{ alumno.nombre }}" required>
-                        </div>
-                    </div>
+    {% csrf_token %}
 
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label><i class="fas fa-user"></i> Apellido Paterno</label>
-                            <input type="text" name="apellido_paterno" placeholder="Apellido Paterno" value="{{ alumno.apellido_paterno }}" required>
-                        </div>
-                        <div class="form-group">
-                            <label><i class="fas fa-user"></i> Apellido Materno</label>
-                            <input type="text" name="apellido_materno" placeholder="Apellido Materno" value="{{ alumno.apellido_materno }}" required>
-                        </div>
-                        <div class="form-group">
-                            <label><i class="fas fa-calendar"></i> Fecha Nacimiento</label>
-                            <input type="date" name="fecha_nacimiento" value="{{ alumno.fecha_nacimiento }}" required>
-                        </div>
-                    </div>
+    <!-- FILA 1 -->
+    <div class="form-row">
 
-                    <div class="form-row two-cols">
-                        <div class="form-group">
-                            <label><i class="fas fa-venus-mars"></i> Género</label>
-                            <select name="genero" required>
-                                <option value="">Seleccione</option>
-                                <option value="M" {% if alumno.genero == 'M' %}selected{% endif %}>Masculino</option>
-                                <option value="F" {% if alumno.genero == 'F' %}selected{% endif %}>Femenino</option>
-                                <option value="N" {% if alumno.genero == 'N' %}selected{% endif %}>Prefiero no decirlo</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label><i class="fas fa-flag"></i> Nacionalidad</label>
-                            <select name="nacionalidad" required>
-                                <option value="">Seleccione</option>
-                                <option value="Chilena" {% if alumno.nacionalidad == 'Chilena' %}selected{% endif %}>Chilena</option>
-                                <option value="Argentina" {% if alumno.nacionalidad == 'Argentina' %}selected{% endif %}>Argentina</option>
-                                <option value="Peruana" {% if alumno.nacionalidad == 'Peruana' %}selected{% endif %}>Peruana</option>
-                                <option value="Venezolana" {% if alumno.nacionalidad == 'Venezolana' %}selected{% endif %}>Venezolana</option>
-                            </select>
-                        </div>
-                    </div>
+        <div class="form-group">
 
-                    <div class="form-row two-cols">
-                        <div class="form-group">
-                            <label><i class="fas fa-road"></i> Calle</label>
-                            <input type="text" name="calle" placeholder="Calle" value="{{ alumno.calle }}" required>
-                        </div>
-                        <div class="form-group">
-                            <label><i class="fas fa-home"></i> Número</label>
-                            <input type="text" name="numero" placeholder="Número" value="{{ alumno.numero }}" required>
-                        </div>
-                    </div>
+            <label>
+                <i class="fas fa-id-card"></i>
+                RUT Número
+            </label>
+
+            <input type="text"
+                   id="rut_numero"
+                   name="rut_numero"
+                   maxlength="8"
+                   placeholder="12345678"
+                   value="{{ alumno.rut_numero }}"
+                   required>
+
+        </div>
+
+        <div class="form-group">
+
+            <label>
+                <i class="fas fa-barcode"></i>
+                DV
+            </label>
+
+            <input type="text"
+                   id="dv"
+                   name="dv"
+                   maxlength="1"
+                   placeholder="K"
+                   value="{{ alumno.dv }}"
+                   readonly
+                   class="dv-input">
+
+        </div>
+
+        <div class="form-group">
+
+            <label>
+                <i class="fas fa-user"></i>
+                Nombre
+            </label>
+
+            <input type="text"
+                   name="nombre"
+                   placeholder="Nombre"
+                   value="{{ alumno.nombre }}"
+                   required>
+
+        </div>
+
+    </div>
+
+    <!-- FILA 2 -->
+    <div class="form-row">
+
+        <div class="form-group">
+
+            <label>
+                <i class="fas fa-user"></i>
+                Apellido Paterno
+            </label>
+
+            <input type="text"
+                   name="apellido_paterno"
+                   placeholder="Apellido Paterno"
+                   value="{{ alumno.apellido_paterno }}"
+                   required>
+
+        </div>
+
+        <div class="form-group">
+
+            <label>
+                <i class="fas fa-user"></i>
+                Apellido Materno
+            </label>
+
+            <input type="text"
+                   name="apellido_materno"
+                   placeholder="Apellido Materno"
+                   value="{{ alumno.apellido_materno }}"
+                   required>
+
+        </div>
+
+        <div class="form-group">
+
+            <label>
+                <i class="fas fa-calendar"></i>
+                Fecha Nacimiento
+            </label>
+
+            <input type="date"
+                   name="fecha_nacimiento"
+                   value="{{ alumno.fecha_nacimiento }}"
+                   required>
+
+        </div>
+
+    </div>
+
+    <!-- FILA 3 -->
+    <div class="form-row two-cols">
+
+        <div class="form-group">
+
+            <label>
+                <i class="fas fa-venus-mars"></i>
+                Género
+            </label>
+
+            <select name="genero" required>
+
+                <option value="">
+                    Seleccione
+                </option>
+
+                <option value="M"
+                {% if alumno.genero == 'M' %}
+                selected
+                {% endif %}>
+                    Masculino
+                </option>
+
+                <option value="F"
+                {% if alumno.genero == 'F' %}
+                selected
+                {% endif %}>
+                    Femenino
+                </option>
+
+                <option value="N"
+                {% if alumno.genero == 'N' %}
+                selected
+                {% endif %}>
+                    Prefiero no decirlo
+                </option>
+
+            </select>
+
+        </div>
+
+        <div class="form-group">
+
+            <label>
+                <i class="fas fa-flag"></i>
+                Nacionalidad
+            </label>
+
+            <select name="nacionalidad" required>
+
+                <option value="">
+                    Seleccione
+                </option>
+
+                <option value="Chilena"
+                {% if alumno.nacionalidad == 'Chilena' %}
+                selected
+                {% endif %}>
+                    Chilena
+                </option>
+
+                <option value="Argentina"
+                {% if alumno.nacionalidad == 'Argentina' %}
+                selected
+                {% endif %}>
+                    Argentina
+                </option>
+
+                <option value="Peruana"
+                {% if alumno.nacionalidad == 'Peruana' %}
+                selected
+                {% endif %}>
+                    Peruana
+                </option>
+
+                <option value="Venezolana"
+                {% if alumno.nacionalidad == 'Venezolana' %}
+                selected
+                {% endif %}>
+                    Venezolana
+                </option>
+
+            </select>
+
+        </div>
+
+    </div>
+
+    <!-- FILA 4 -->
+    <div class="form-row two-cols">
+
+        <div class="form-group">
+
+            <label>
+                <i class="fas fa-road"></i>
+                Calle
+            </label>
+
+            <input type="text"
+                   name="calle"
+                   placeholder="Calle"
+                   value="{{ alumno.calle }}"
+                   required>
+
+        </div>
+
+        <div class="form-group">
+
+            <label>
+                <i class="fas fa-home"></i>
+                Número
+            </label>
+
+            <input type="text"
+                   name="numero"
+                   placeholder="Número"
+                   value="{{ alumno.numero }}"
+                   required>
+
+        </div>
+
+    </div>
+
+    <!-- FILA 5 -->
+    <div class="form-row two-cols">
+
+        <div class="form-group">
+
+            <label>
+                <i class="fas fa-envelope"></i>
+                Correo Electrónico
+            </label>
+
+            <input type="email"
+                   name="email"
+                   placeholder="correo@ejemplo.com"
+                   value="{{ alumno.email }}"
+                   required>
+
+        </div>
+
+        <div class="form-group">
+
+            <label>
+                <i class="fas fa-lock"></i>
+                Contraseña
+            </label>
+
+            <input type="password"
+                   name="password"
+                   placeholder="Ingrese contraseña"
+                   required>
+
+        </div>
+
+    </div>
 
                     <div class="form-row two-cols">
                         <div class="form-group">
@@ -206,16 +405,9 @@
                             </select>
                         </div>
                     </div>
-
-                    <div class="form-row two-cols">
-                        <div class="form-group">
-                            <label><i class="fas fa-envelope"></i> Correo</label>
-                            <input type="email" name="email" placeholder="Correo" value="{{ alumno.email }}" required>
-                        </div>
-                        <div class="form-group">
-                            <label><i class="fas fa-phone"></i> Teléfono</label>
-                            <input type="text" name="fono" placeholder="Teléfono" value="{{ alumno.fono }}" required>
-                        </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-phone"></i> Teléfono</label>
+                        <input type="text" name="fono" placeholder="Teléfono" value="{{ alumno.fono }}" required>
                     </div>
 
                     <div class="form-actions">

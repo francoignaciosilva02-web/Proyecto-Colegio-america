@@ -5,7 +5,7 @@ urlpatterns = [
     # LOGIN
     path('', login_view, name='login'),
     path('logout/', logout_view, name='logout'),
-    path('token/', token_view, name='token'),
+    #path('token/', token_view, name='token'),
 
     # DASHBOARD
     path('admin/dashboard/', admin_dashboard_view, name='admin_dashboard'),

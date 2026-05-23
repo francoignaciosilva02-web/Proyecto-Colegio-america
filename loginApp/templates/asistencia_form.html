@@ -2,44 +2,222 @@
 <html>
 <head>
     <title>Registrar Asistencia</title>
+
     {% load static %}
-    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
-    <link rel="stylesheet" href="{% static 'css/asistencia_form.css' %}">
+
+    <link rel="stylesheet" href="{% static 'css/admin_dashboard.css' %}">
+    <link rel="stylesheet" href="{% static 'css/accordion-menu.css' %}">
+
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
 </head>
+
 <body>
 
-<div class="form-container">
-    <h2>📅 Registrar Asistencia</h2>
+<div class="admin-layout">
 
-    <form method="post">
-        {% csrf_token %}
+    <!-- SIDEBAR -->
+    <div class="sidebar">
 
-        <div class="form-group">
-            <label>Alumno / Curso</label>
-            <select name="id_inscripcion" required>
-                <option value="">Seleccione alumno y curso</option>
-                {% for i in inscripciones %}
-                <option value="{{ i.id_inscripcion }}">
-                    {{ i.nombre }} {{ i.apellido_paterno }} - {{ i.nombre_curso }}
-                </option>
-                {% endfor %}
-            </select>
+        <h3>
+            <i class="fas fa-database"></i>
+            Panel de Control
+        </h3>
+
+        <ul class="accordion-menu">
+
+            <li class="accordion-item">
+
+                <div class="accordion-header active"
+                     onclick="toggleAccordion(this)">
+
+                    <span class="accordion-title">
+                        <i class="fas fa-user-check"
+                           style="color:#4CAF50;"></i>
+
+                        Asistencia
+                    </span>
+
+                    <i class="fas fa-chevron-down accordion-icon"></i>
+
+                </div>
+
+                <div class="accordion-content active">
+
+                    <ul>
+
+                        <li>
+                            <a href="{% url 'asistencia_list' %}">
+
+                                <i class="fas fa-list"></i>
+                                Ver Asistencia
+
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="{% url 'asistencia_create' %}"
+                               class="active">
+
+                                <i class="fas fa-plus"></i>
+                                Registrar Asistencia
+
+                            </a>
+                        </li>
+
+                    </ul>
+
+                </div>
+
+            </li>
+
+        </ul>
+
+    </div>
+
+    <!-- CONTENIDO -->
+    <div class="main-content">
+
+        <div class="dashboard-header">
+
+            <div class="header-title">
+
+                <span class="admin-badge">
+                    ADMIN
+                </span>
+
+                <h1>
+                    <i class="fas fa-clipboard-check"></i>
+                    Registro de Asistencia
+                </h1>
+
+            </div>
+
         </div>
 
-        <div class="form-group">
-            <label>Estado</label>
-            <select name="estado" required>
-                <option value="P">Presente</option>
-                <option value="A">Ausente</option>
-                <option value="J">Justificado</option>
-            </select>
+        <div class="data-section">
+
+            <h3>
+                <i class="fas fa-user-check"></i>
+                Registrar Asistencia
+            </h3>
+
+            <form method="post" class="admin-form">
+
+                {% csrf_token %}
+
+                <div class="form-row">
+
+                    <!-- ALUMNO -->
+                    <div class="form-group">
+
+                        <label>
+                            Alumno / Curso
+                        </label>
+
+                        <select name="id_inscripcion" required>
+
+                            <option value="">
+                                Seleccione alumno y curso
+                            </option>
+
+                            {% for i in inscripciones %}
+
+                            <option value="{{ i.id_inscripcion }}">
+
+                                {{ i.nombre }}
+                                {{ i.apellido_paterno }}
+                                -
+                                {{ i.nombre_curso }}
+
+                            </option>
+
+                            {% endfor %}
+
+                        </select>
+
+                    </div>
+
+                    <!-- ESTADO -->
+                    <div class="form-group">
+
+                        <label>
+                            Estado
+                        </label>
+
+                        <select name="estado" required>
+
+                            <option value="P">
+                                Presente
+                            </option>
+
+                            <option value="A">
+                                Ausente
+                            </option>
+
+                            <option value="J">
+                                Justificado
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+                <!-- BOTONES -->
+                <div class="form-actions">
+
+                    <button type="submit"
+                            class="btn-submit">
+
+                        <i class="fas fa-save"></i>
+                        Guardar Asistencia
+
+                    </button>
+
+                    <a href="{% url 'asistencia_list' %}"
+                       class="btn-cancel">
+
+                        <i class="fas fa-arrow-left"></i>
+                        Volver
+
+                    </a>
+
+                </div>
+
+            </form>
+
         </div>
 
-        <button type="submit" class="btn-submit">Guardar Asistencia</button>
-    </form>
+    </div>
 
-    <a href="{% url 'asistencia_list' %}" class="back-link">← Volver a la lista</a>
 </div>
 
+<script>
+
+function toggleAccordion(header){
+
+    document.querySelectorAll('.accordion-header')
+    .forEach(h => {
+
+        if(h !== header &&
+           h.classList.contains('active')){
+
+            h.classList.remove('active');
+
+            h.nextElementSibling
+             .classList.remove('active');
+        }
+    });
+
+    header.classList.toggle('active');
+
+    header.nextElementSibling
+          .classList.toggle('active');
+}
+
+</script>
+
 </body>
-</html>
+    </html>

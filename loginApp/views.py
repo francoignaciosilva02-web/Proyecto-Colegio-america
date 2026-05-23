@@ -6,60 +6,134 @@ import random
 from .utils import RutValidator
 from datetime import datetime, date
 from django.db import connection
+from django.http import HttpResponse
 
 
 def login_view(request):
+
     if request.method == 'POST':
+
         email = request.POST.get('email')
         password = request.POST.get('password')
         ip = request.META.get('REMOTE_ADDR')
 
-        print(f"=" * 50)
-        print(f"DEBUG LOGIN - Email: '{email}', Password: '{password}'")
-        print(f"=" * 50)
+        print("=" * 50)
+        print(f"DEBUG LOGIN - Email: '{email}'")
+        print(f"DEBUG LOGIN - Password: '{password}'")
+        print("=" * 50)
 
         try:
+
             conn = pyodbc.connect(
                 'DRIVER={ODBC Driver 17 for SQL Server};'
                 'SERVER=localhost;'
                 'DATABASE=proyectoinformatico;'
                 'Trusted_Connection=yes;'
             )
+
             cursor = conn.cursor()
 
-            # LOGIN directo verificando password_hash
-            print(f"DEBUG: Verificando login directo...")
+            # ============================================
+            # LOGIN USUARIOS
+            # ADMIN / DOCENTE / APODERADO
+            # ============================================
+
             cursor.execute("""
-                SELECT id_usuario, correo, nombre, rol, password_hash 
-                FROM usuarios 
-                WHERE correo = ? AND password_hash = ?
+                SELECT
+                    id_usuario,
+                    correo,
+                    nombre,
+                    rol,
+                    password_hash
+                FROM usuarios
+                WHERE correo = ?
+                AND password_hash = ?
             """, (email, password))
+
             user_check = cursor.fetchone()
 
+            # ============================================
+            # SI NO EXISTE EN USUARIOS
+            # BUSCAR EN ALUMNOS
+            # ============================================
+
             if not user_check:
-                print(f"DEBUG: Login fallido - credenciales incorrectas")
-                # Registrar intento fallido usando SP
+
+                print("DEBUG: No encontrado en usuarios")
+                print("DEBUG: Buscando alumno...")
+
+                cursor.execute("""
+                    SELECT
+                        id_alumno,
+                        email,
+                        nombre,
+                        password
+                    FROM alumnos
+                    WHERE email = ?
+                    AND password = ?
+                """, (email, password))
+
+                alumno_check = cursor.fetchone()
+
+                # ============================================
+                # LOGIN FALLIDO
+                # ============================================
+
+                if not alumno_check:
+
+                    print("DEBUG: Credenciales incorrectas")
+
+                    cursor.execute("""
+                        EXEC sp_registrar_log ?, ?, ?
+                    """, (
+                        None,
+                        f'Intento fallido: {email}',
+                        ip
+                    ))
+
+                    conn.commit()
+
+                    return render(request, 'login.html', {
+                        'error': 'Credenciales incorrectas'
+                    })
+
+                # ============================================
+                # LOGIN ALUMNO EXITOSO
+                # ============================================
+
+                print("DEBUG: LOGIN ALUMNO EXITOSO")
+
+                id_alumno = alumno_check[0]
+                nombre_alumno = alumno_check[2]
+
+                request.session['autenticado'] = True
+                request.session['rol'] = 'alumno'
+                request.session['email'] = email
+                request.session['id_alumno'] = id_alumno
+                request.session['nombre'] = nombre_alumno
+
                 cursor.execute("""
                     EXEC sp_registrar_log ?, ?, ?
                 """, (
                     None,
-                    f'Intento fallido: {email}',
+                    f'Alumno inició sesión: {email}',
                     ip
                 ))
+
                 conn.commit()
 
-                return render(request, 'login.html', {
-                    'error': 'Credenciales incorrectas'
-                })
+                return redirect('alumno_dashboard')
 
-            print(f"DEBUG: Login exitoso - id={user_check[0]}, rol={user_check[3]}")
+            # ============================================
+            # LOGIN USUARIO NORMAL EXITOSO
+            # ============================================
 
-            # Usar datos ya obtenidos en user_check
+            print("DEBUG: LOGIN USUARIO EXITOSO")
+
             id_usuario = user_check[0]
 
             request.session['email'] = email
 
-            # guardar intento exitoso usando SP
             cursor.execute("""
                 EXEC sp_registrar_log ?, ?, ?
             """, (
@@ -67,66 +141,50 @@ def login_view(request):
                 'Inicio sesión exitoso',
                 ip
             ))
+
             conn.commit()
 
-            # generar token
-            token = str(random.randint(100000, 999999))
+            # ============================================
+            # OBTENER ROL
+            # ============================================
 
-            # Usar datos ya obtenidos en user_check
-            nombre_usuario = user_check[2] if user_check[2] else email.split('@')[0]
             rol = user_check[3]
 
-            # DEBUG: Ver el rol real
             print(f"DEBUG ROL ORIGINAL: '{rol}'")
+
             rol = rol.strip().lower() if rol else ''
+
             print(f"DEBUG ROL PROCESADO: '{rol}'")
 
-            # Guardar id_usuario y rol en sesión para control de acceso
+            # ============================================
+            # SESIONES
+            # ============================================
+
             request.session['id_usuario'] = id_usuario
             request.session['rol'] = rol
-
-            # COMENTADO: Envío de código verificador por email
-            # Descomentar estas líneas para activar verificación 2FA
-            # token = str(random.randint(100000, 999999))
-            # nombre_usuario = user_check[2] if user_check[2] else email.split('@')[0]
-            # cursor.execute('''
-            #     INSERT INTO tokens_sesion (id_usuario, token, fecha_expiracion, usado, activo)
-            #     VALUES (?, ?, DATEADD(MINUTE, 5, GETDATE()), 0, 1)
-            # ''', (id_usuario, token))
-            # conn.commit()
-            # from django.template.loader import render_to_string
-            # html_message = render_to_string('email_verificacion.html', {
-            #     'nombre_usuario': nombre_usuario,
-            #     'token': token
-            # })
-            # send_mail(
-            #     'Código de verificación',
-            #     f'Tu código es: {token}',
-            #     settings.EMAIL_HOST_USER,
-            #     ['franco.silvaah@correoaiep.cl'],
-            #     fail_silently=False,
-            #     html_message=html_message
-            # )
-            # return redirect('token')
-
-            # BYPASS: Login directo sin verificación de código
             request.session['autenticado'] = True
 
-            # Redirección según rol (ya está en minúsculas)
-            print(f"DEBUG REDIRECCION - ROL: '{rol}'")
+            # ============================================
+            # REDIRECCIÓN
+            # ============================================
+
             if rol == 'admin':
                 return redirect('admin_dashboard')
+
             elif rol == 'docente':
                 return redirect('docente_dashboard')
-            elif rol == 'alumno':
-                return redirect('alumno_dashboard')
+
             elif rol == 'apoderado':
                 return redirect('apoderado_dashboard')
+
+            elif rol == 'alumno':
+                return redirect('alumno_dashboard')
+
             else:
-                print(f"DEBUG: Rol no reconocido, redirigiendo a home")
                 return redirect('home')
 
         except Exception as e:
+
             return render(request, 'login.html', {
                 'error': str(e)
             })
@@ -134,72 +192,26 @@ def login_view(request):
     return render(request, 'login.html')
 
 
+# ============================================
+# LOGOUT
+# ============================================
+
 def logout_view(request):
+
     request.session.flush()
+
     return redirect('login')
 
 
-def token_view(request):
-    if request.method == 'POST':
-        token_ingresado = request.POST.get('token')
-        email = request.session.get('email')
+# ============================================
+# TOKEN (DESACTIVADO)
+# ============================================
 
-        if not email:
-            return redirect('login')
+# def token_view(request):
+#     pass
 
-        try:
-            conn = pyodbc.connect(
-                'DRIVER={ODBC Driver 17 for SQL Server};'
-                'SERVER=localhost;'
-                'DATABASE=proyectoinformatico;'
-                'Trusted_Connection=yes;'
-            )
-            cursor = conn.cursor()
 
-            cursor.execute("""
-                SELECT t.token
-                FROM tokens_sesion t
-                JOIN usuarios u ON t.id_usuario = u.id_usuario
-                WHERE t.token = ?
-                AND u.correo = ?
-                AND t.usado = 0
-                AND t.fecha_expiracion > GETDATE()
-            """, (token_ingresado, email))
 
-            row = cursor.fetchone()
-
-            if row:
-                # marcar como usado
-                cursor.execute("""
-                    UPDATE tokens_sesion
-                    SET usado = 1
-                    WHERE token = ?
-                """, (token_ingresado,))
-                conn.commit()
-
-                request.session['autenticado'] = True
-
-                # Redirección según rol
-                rol = request.session.get('rol')
-
-                if rol == 'admin':
-                    return redirect('admin_dashboard')
-                elif rol == 'docente':
-                    return redirect('docente_dashboard')
-                else:
-                    return redirect('login')
-
-            else:
-                return render(request, 'token.html', {
-                    'error': 'Token inválido o expirado'
-                })
-
-        except Exception as e:
-            return render(request, 'token.html', {
-                'error': str(e)
-            })
-
-    return render(request, 'token.html')
 
 
 def admin_dashboard_view(request):
@@ -275,20 +287,38 @@ def alumnos_list(request):
     return render(request, 'alumnos_list.html', {'alumnos': alumnos})
 
 
-# 🔹 CREAR
+# CREAR
 def alumnos_create(request):
+
     if not request.session.get('autenticado'):
         return redirect('login')
 
     if request.method == 'POST':
+
         conn = get_connection()
         cursor = conn.cursor()
 
         cursor.execute("""
-            INSERT INTO alumnos (rut_numero, dv, nombre, apellido_paterno, apellido_materno, fecha_nacimiento, genero,
-            nacionalidad, calle, numero, comuna, region, email, fono)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO alumnos (
+                rut_numero,
+                dv,
+                nombre,
+                apellido_paterno,
+                apellido_materno,
+                fecha_nacimiento,
+                genero,
+                nacionalidad,
+                calle,
+                numero,
+                comuna,
+                region,
+                email,
+                fono,
+                password
+            )
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, (
+
             request.POST['rut_numero'],
             request.POST['dv'],
             request.POST['nombre'],
@@ -303,14 +333,18 @@ def alumnos_create(request):
             request.POST['region'],
             request.POST['email'],
             request.POST['fono'],
+            request.POST['password'],
+
         ))
 
         conn.commit()
+
         return redirect('alumnos_list')
 
-    return render(request, 'alumnos_form.html')
-
-
+    return render(
+        request,
+        'alumnos_form.html'
+    )
 # 🔹 EDITAR
 def alumnos_edit(request, id):
     if not request.session.get('autenticado'):
@@ -942,20 +976,26 @@ def datos_medicos_view(request):
             grupo_sanguineo = request.POST.get('grupo_sanguineo', '')
             alergias = request.POST['alergias']
             enfermedades = request.POST['enfermedades']
+            contacto_emergencia = request.POST.get('contacto_emergencia')
+            telefono_emergencia = request.POST.get('telefono_emergencia')
 
             cursor.execute("""
                 INSERT INTO datos_medicos (
                     id_alumno,
                     grupo_sanguineo,
                     alergias,
-                    enfermedades
+                    enfermedades,
+                    contacto_emergencia,
+                    telefono_emergencia
                 )
-                VALUES (?, ?, ?, ?)
+                VALUES (?, ?, ?, ?, ?, ?)
             """, (
                 id_alumno,
                 grupo_sanguineo,
                 alergias,
-                enfermedades
+                enfermedades,
+                contacto_emergencia,
+                telefono_emergencia
             ))
 
             conn.commit()
@@ -1234,64 +1274,108 @@ def docente_dashboard_view(request):
 # =========================
 
 def alumno_dashboard_view(request):
-    if not request.session.get('autenticado'):
+
+    if 'id_alumno' not in request.session:
         return redirect('login')
 
-    rol = request.session.get('rol', '').lower()
-    print(f"DEBUG DASHBOARD ALUMNO - ROL EN SESION: '{rol}'")
-
-    if rol != 'alumno':
-        return redirect('login')
-
-    id_usuario = request.session.get('id_usuario')
+    id_alumno = request.session['id_alumno']
 
     conn = get_connection()
     cursor = conn.cursor()
 
-    # Obtener alumno asociado al usuario
+    # =========================
+    # DATOS ALUMNO
+    # =========================
     cursor.execute("""
-        SELECT a.id_alumno, a.nombre, a.apellido_paterno
-        FROM alumnos a
-        JOIN usuarios u ON u.correo = a.email
-        WHERE u.id_usuario = ?
-    """, (id_usuario,))
+        SELECT TOP 1
+            id_alumno,
+            nombre,
+            apellido_paterno,
+            apellido_materno
+        FROM alumnos
+        WHERE id_alumno = ?
+    """, [id_alumno])
 
     alumno = cursor.fetchone()
 
     if not alumno:
         return redirect('login')
 
-    id_alumno = alumno[0]
-    nombre_alumno = f"{alumno[1]} {alumno[2]}"
+    nombre_completo = f"{alumno[1]} {alumno[2]} {alumno[3]}"
 
-    # Cursos del alumno
+    # =========================
+    # CURSOS DEL ALUMNO
+    # =========================
     cursor.execute("""
-        SELECT c.nombre_curso, d.nombre as docente
+        SELECT
+            c.nombre_curso,
+            d.nombre,
+            d.paterno
         FROM inscripcion i
-        JOIN curso c ON i.id_curso = c.id_curso
-        JOIN docente d ON c.id_docente = d.id_docente
+        INNER JOIN curso c
+            ON i.id_curso = c.id_curso
+        LEFT JOIN docente d
+            ON c.id_docente = d.id_docente
         WHERE i.id_alumno = ?
-    """, (id_alumno,))
+    """, [id_alumno])
+
     cursos = cursor.fetchall()
 
-    # Asistencia del alumno
+    # =========================
+    # ASISTENCIA
+    # =========================
     cursor.execute("""
-        SELECT TOP 10 a.fecha, c.nombre_curso, a.estado
+        SELECT TOP 10
+            a.fecha,
+            c.nombre_curso,
+            a.estado
         FROM asistencia a
-        JOIN inscripcion i ON a.id_inscripcion = i.id_inscripcion
-        JOIN curso c ON i.id_curso = c.id_curso
+        INNER JOIN inscripcion i
+            ON a.id_inscripcion = i.id_inscripcion
+        INNER JOIN curso c
+            ON i.id_curso = c.id_curso
         WHERE i.id_alumno = ?
         ORDER BY a.fecha DESC
-    """, (id_alumno,))
-    asistencias = cursor.fetchall()
+    """, [id_alumno])
 
-    return render(request, 'alumno_dashboard.html', {
-        'nombre_alumno': nombre_alumno,
+    asistencia = cursor.fetchall()
+
+    # =========================
+    # NOTAS
+    # =========================
+    cursor.execute("""
+        SELECT TOP 10
+            m.nombre,
+            n.nota,
+            n.fecha
+                FROM notas n
+                INNER JOIN materias m
+                    ON n.id_materia = m.id_materia
+                WHERE n.id_alumno = ?
+                    ORDER BY n.fecha DESC
+            """, [id_alumno])
+
+
+    notas = cursor.fetchall()
+
+    conn.close()
+
+    contexto = {
+        'nombre_alumno': nombre_completo,
         'cursos': cursos,
-        'asistencias': asistencias
-    })
+        'asistencias': asistencia,
+        'notas': notas
+    }
+
+    return render(request, 'alumno_dashboard.html', contexto)
+
+
+# =========================
+# LIBRO NOTAS
+# =========================
 
 def libro_notas_view(request, id_alumno):
+
     connection = get_connection()
     cursor = connection.cursor()
 
@@ -1307,6 +1391,7 @@ def libro_notas_view(request, id_alumno):
     libro = {}
 
     for row in resultados:
+
         materia = row[0]
         id_nota = row[1]
         nota = row[2]
@@ -1336,12 +1421,14 @@ def libro_notas_view(request, id_alumno):
 
     connection.close()
 
-    return render(request,
-                  'libro_notas.html',
-                  {
-                      'libro': libro,
-                      'promedios': promedios
-                  })
+    return render(
+        request,
+        'libro_notas.html',
+        {
+            'libro': libro,
+            'promedios': promedios
+        }
+    )
 
 def admin_calificaciones_view(request):
     if not request.session.get('autenticado'):
@@ -1657,7 +1744,6 @@ def apoderado_dashboard_view(request):
         return redirect('login')
 
     rol = request.session.get('rol', '').lower()
-    print(f"DEBUG DASHBOARD APODERADO - ROL EN SESION: '{rol}'")
 
     if rol != 'apoderado':
         return redirect('login')
@@ -1671,7 +1757,7 @@ def apoderado_dashboard_view(request):
     cursor.execute("""
         SELECT id_apoderado, nombre
         FROM apoderado
-        WHERE email = (SELECT correo FROM usuarios WHERE id_usuario = ?)
+        WHERE id_usuario = ?
     """, (id_usuario,))
 
     apoderado = cursor.fetchone()
@@ -1684,13 +1770,27 @@ def apoderado_dashboard_view(request):
 
     # Alumnos a cargo del apoderado
     cursor.execute("""
-        SELECT a.id_alumno, a.nombre, a.apellido_paterno, a.apellido_materno, c.nombre_curso
+        SELECT 
+            a.id_alumno,
+            a.nombre,
+            a.apellido_paterno,
+            a.apellido_materno,
+            c.nombre_curso
+
         FROM alumno_apoderado aa
-        JOIN alumnos a ON aa.id_alumno = a.id_alumno
-        LEFT JOIN inscripcion i ON a.id_alumno = i.id_alumno
-        LEFT JOIN curso c ON i.id_curso = c.id_curso
+
+        JOIN alumnos a 
+            ON aa.id_alumno = a.id_alumno
+
+        LEFT JOIN inscripcion i 
+            ON a.id_alumno = i.id_alumno
+
+        LEFT JOIN curso c 
+            ON i.id_curso = c.id_curso
+
         WHERE aa.id_apoderado = ?
     """, (id_apoderado,))
+
     alumnos = cursor.fetchall()
 
     return render(request, 'apoderado_dashboard.html', {
@@ -1698,6 +1798,10 @@ def apoderado_dashboard_view(request):
         'alumnos': alumnos
     })
 
+
+# =========================
+# HIJOS APODERADO
+# =========================
 
 def apoderado_hijos_view(request):
     if not request.session.get('autenticado'):
@@ -1708,14 +1812,16 @@ def apoderado_hijos_view(request):
         return redirect('login')
 
     id_usuario = request.session.get('id_usuario')
+
     conn = get_connection()
     cursor = conn.cursor()
 
     cursor.execute("""
         SELECT id_apoderado, nombre, apellido
         FROM apoderado
-        WHERE email = (SELECT correo FROM usuarios WHERE id_usuario = ?)
+        WHERE id_usuario = ?
     """, (id_usuario,))
+
     apoderado = cursor.fetchone()
 
     if not apoderado:
@@ -1725,15 +1831,26 @@ def apoderado_hijos_view(request):
     nombre_apoderado = f"{apoderado[1]} {apoderado[2]}"
 
     cursor.execute("""
-        SELECT a.id_alumno, a.nombre, a.apellido_paterno, a.apellido_materno,
-               a.fecha_nacimiento, a.genero, a.email, a.fono,
-               c.nombre_curso, c.nivel
+        SELECT a.id_alumno,
+               a.nombre,
+               a.apellido_paterno,
+               a.apellido_materno,
+               a.fecha_nacimiento,
+               a.genero,
+               a.email,
+               a.fono,
+               c.nombre_curso,
+               c.año_academico
         FROM alumno_apoderado aa
-        JOIN alumnos a ON aa.id_alumno = a.id_alumno
-        LEFT JOIN inscripcion i ON a.id_alumno = i.id_alumno
-        LEFT JOIN curso c ON i.id_curso = c.id_curso
+        JOIN alumnos a 
+            ON aa.id_alumno = a.id_alumno
+        LEFT JOIN inscripcion i 
+            ON a.id_alumno = i.id_alumno
+        LEFT JOIN curso c 
+            ON i.id_curso = c.id_curso
         WHERE aa.id_apoderado = ?
     """, (id_apoderado,))
+
     hijos = cursor.fetchall()
 
     return render(request, 'apoderado_hijos.html', {
@@ -1742,23 +1859,30 @@ def apoderado_hijos_view(request):
     })
 
 
+# =========================
+# ASISTENCIA APODERADO
+# =========================
+
 def apoderado_asistencia_view(request):
     if not request.session.get('autenticado'):
         return redirect('login')
 
     rol = request.session.get('rol', '').lower()
+
     if rol != 'apoderado':
         return redirect('login')
 
     id_usuario = request.session.get('id_usuario')
+
     conn = get_connection()
     cursor = conn.cursor()
 
     cursor.execute("""
         SELECT id_apoderado, nombre, apellido
         FROM apoderado
-        WHERE email = (SELECT correo FROM usuarios WHERE id_usuario = ?)
+        WHERE id_usuario = ?
     """, (id_usuario,))
+
     apoderado = cursor.fetchone()
 
     if not apoderado:
@@ -1768,15 +1892,33 @@ def apoderado_asistencia_view(request):
     nombre_apoderado = f"{apoderado[1]} {apoderado[2]}"
 
     cursor.execute("""
-        SELECT a.nombre, a.apellido_paterno, a.apellido_materno,
-               asis.fecha, asis.estado, c.nombre_curso
+        SELECT 
+            a.nombre,
+            a.apellido_paterno,
+            a.apellido_materno,
+            asis.fecha,
+            asis.estado,
+            c.nombre_curso
+
         FROM alumno_apoderado aa
-        JOIN alumnos a ON aa.id_alumno = a.id_alumno
-        LEFT JOIN asistencia asis ON a.id_alumno = asis.id_alumno
-        LEFT JOIN curso c ON asis.id_curso = c.id_curso
+
+        JOIN alumnos a 
+            ON aa.id_alumno = a.id_alumno
+
+        LEFT JOIN inscripcion i 
+            ON a.id_alumno = i.id_alumno
+
+        LEFT JOIN asistencia asis 
+            ON i.id_inscripcion = asis.id_inscripcion
+
+        LEFT JOIN curso c 
+            ON i.id_curso = c.id_curso
+
         WHERE aa.id_apoderado = ?
+
         ORDER BY asis.fecha DESC
     """, (id_apoderado,))
+
     asistencias = cursor.fetchall()
 
     return render(request, 'apoderado_asistencia.html', {
@@ -1785,23 +1927,30 @@ def apoderado_asistencia_view(request):
     })
 
 
+# =========================
+# NOTAS APODERADO
+# =========================
+
 def apoderado_notas_view(request):
     if not request.session.get('autenticado'):
         return redirect('login')
 
     rol = request.session.get('rol', '').lower()
+
     if rol != 'apoderado':
         return redirect('login')
 
     id_usuario = request.session.get('id_usuario')
+
     conn = get_connection()
     cursor = conn.cursor()
 
     cursor.execute("""
         SELECT id_apoderado, nombre, apellido
         FROM apoderado
-        WHERE email = (SELECT correo FROM usuarios WHERE id_usuario = ?)
+        WHERE id_usuario = ?
     """, (id_usuario,))
+
     apoderado = cursor.fetchone()
 
     if not apoderado:
@@ -1811,16 +1960,37 @@ def apoderado_notas_view(request):
     nombre_apoderado = f"{apoderado[1]} {apoderado[2]}"
 
     cursor.execute("""
-        SELECT a.nombre, a.apellido_paterno, a.apellido_materno,
-               n.nota, n.fecha_evaluacion, c.nombre_curso, asig.nombre_asignatura
-        FROM alumno_apoderado aa
-        JOIN alumnos a ON aa.id_alumno = a.id_alumno
-        LEFT JOIN notas n ON a.id_alumno = n.id_alumno
-        LEFT JOIN curso c ON n.id_curso = c.id_curso
-        LEFT JOIN asignaturas asig ON n.id_asignatura = asig.id_asignatura
-        WHERE aa.id_apoderado = ?
-        ORDER BY n.fecha_evaluacion DESC
-    """, (id_apoderado,))
+    SELECT 
+        a.nombre,
+        a.apellido_paterno,
+        a.apellido_materno,
+        n.nota,
+        n.fecha,
+        c.nombre_curso,
+        m.nombre AS nombre_materia
+
+    FROM alumno_apoderado aa
+
+    JOIN alumnos a 
+        ON aa.id_alumno = a.id_alumno
+
+    LEFT JOIN notas n 
+        ON a.id_alumno = n.id_alumno
+
+    LEFT JOIN materias m 
+        ON n.id_materia = m.id_materia
+
+    LEFT JOIN inscripcion i 
+        ON a.id_alumno = i.id_alumno
+
+    LEFT JOIN curso c 
+        ON i.id_curso = c.id_curso
+
+    WHERE aa.id_apoderado = ?
+
+    ORDER BY n.fecha DESC
+""", (id_apoderado,))
+
     notas = cursor.fetchall()
 
     return render(request, 'apoderado_notas.html', {
@@ -1829,23 +1999,30 @@ def apoderado_notas_view(request):
     })
 
 
+# =========================
+# DATOS MEDICOS APODERADO
+# =========================
+
 def apoderado_medico_view(request):
     if not request.session.get('autenticado'):
         return redirect('login')
 
     rol = request.session.get('rol', '').lower()
+
     if rol != 'apoderado':
         return redirect('login')
 
     id_usuario = request.session.get('id_usuario')
+
     conn = get_connection()
     cursor = conn.cursor()
 
     cursor.execute("""
         SELECT id_apoderado, nombre, apellido
         FROM apoderado
-        WHERE email = (SELECT correo FROM usuarios WHERE id_usuario = ?)
+        WHERE id_usuario = ?
     """, (id_usuario,))
+
     apoderado = cursor.fetchone()
 
     if not apoderado:
@@ -1855,14 +2032,25 @@ def apoderado_medico_view(request):
     nombre_apoderado = f"{apoderado[1]} {apoderado[2]}"
 
     cursor.execute("""
-        SELECT a.nombre, a.apellido_paterno, a.apellido_materno,
-               dm.alergias, dm.enfermedades_cronicas, dm.medicamentos,
-               dm.contacto_emergencia, dm.fono_emergencia
+        SELECT 
+            a.nombre,
+            a.apellido_paterno,
+            a.apellido_materno,
+            dm.grupo_sanguineo,
+            dm.alergias,
+            dm.enfermedades
+
         FROM alumno_apoderado aa
-        JOIN alumnos a ON aa.id_alumno = a.id_alumno
-        LEFT JOIN datos_medicos dm ON a.id_alumno = dm.id_alumno
+
+        JOIN alumnos a 
+            ON aa.id_alumno = a.id_alumno
+
+        LEFT JOIN datos_medicos dm 
+            ON a.id_alumno = dm.id_alumno
+
         WHERE aa.id_apoderado = ?
     """, (id_apoderado,))
+
     datos_medicos = cursor.fetchall()
 
     return render(request, 'apoderado_medico.html', {
@@ -1871,23 +2059,30 @@ def apoderado_medico_view(request):
     })
 
 
+# =========================
+# OBSERVACIONES APODERADO
+# =========================
+
 def apoderado_observaciones_view(request):
     if not request.session.get('autenticado'):
         return redirect('login')
 
     rol = request.session.get('rol', '').lower()
+
     if rol != 'apoderado':
         return redirect('login')
 
     id_usuario = request.session.get('id_usuario')
+
     conn = get_connection()
     cursor = conn.cursor()
 
     cursor.execute("""
         SELECT id_apoderado, nombre, apellido
         FROM apoderado
-        WHERE email = (SELECT correo FROM usuarios WHERE id_usuario = ?)
+        WHERE id_usuario = ?
     """, (id_usuario,))
+
     apoderado = cursor.fetchone()
 
     if not apoderado:
@@ -1897,23 +2092,38 @@ def apoderado_observaciones_view(request):
     nombre_apoderado = f"{apoderado[1]} {apoderado[2]}"
 
     cursor.execute("""
-        SELECT a.nombre, a.apellido_paterno, a.apellido_materno,
-               o.fecha, o.observacion, o.tipo, d.nombre as docente
+        SELECT 
+            a.nombre,
+            a.apellido_paterno,
+            a.apellido_materno,
+            o.fecha,
+            o.observacion,
+            o.tipo,
+            d.nombre as docente
+
         FROM alumno_apoderado aa
-        JOIN alumnos a ON aa.id_alumno = a.id_alumno
-        LEFT JOIN observaciones o ON a.id_alumno = o.id_alumno
-        LEFT JOIN docente d ON o.id_docente = d.id_docente
+
+        JOIN alumnos a 
+            ON aa.id_alumno = a.id_alumno
+
+        LEFT JOIN observaciones o 
+            ON a.id_alumno = o.id_alumno
+
+        LEFT JOIN docente d 
+            ON o.id_docente = d.id_docente
+
         WHERE aa.id_apoderado = ?
+
         ORDER BY o.fecha DESC
     """, (id_apoderado,))
+
     observaciones = cursor.fetchall()
 
     return render(request, 'apoderado_observaciones.html', {
         'nombre_apoderado': nombre_apoderado,
         'observaciones': observaciones
     })
-
-
+    
 # =========================
 # TOMA DE DATOS (ADMIN)
 # =========================
