@@ -57,7 +57,6 @@ def login_view(request):
             # Usar datos ya obtenidos en user_check
             id_usuario = user_check[0]
 
-            # LOGIN CORRECTO
             request.session['email'] = email
 
             # guardar intento exitoso usando SP
